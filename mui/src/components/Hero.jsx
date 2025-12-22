@@ -11,7 +11,7 @@ const Hero = () => {
         sx={{
         
           width: "100%",
-            minHeight: "85vh",
+            minHeight: "55vh",
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -34,7 +34,7 @@ const Hero = () => {
             Tech for Everyone
           </Typography>
           <Typography
-            variant="h1"
+            variant="h3"
             sx={{ fontSize: { xs: "1rem", md: "1.5rem" } }}
           >
             The Tech revolution strated since 2021

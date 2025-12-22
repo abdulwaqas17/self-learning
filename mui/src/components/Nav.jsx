@@ -35,11 +35,12 @@ const Navbar = () => {
 
   const drawerLinks = [
     { title: "Home", link: "#home" },
+    { title: "About", link: "#About" },
     { title: "Tech", link: "#tech" },
   ];
   return (
     <>
-      <AppBar position="fixed" color="primary">
+      <AppBar position="sticky" color="primary">
         <Container>
           <Toolbar>
             <DeveloperModeIcon />
@@ -59,6 +60,9 @@ const Navbar = () => {
               <>
             <Button color="inherit" href="#home">
               Home
+            </Button>
+            <Button color="inherit" href="#About">
+              About
             </Button>
             <Button color="inherit" href="#tech">
               Tech
