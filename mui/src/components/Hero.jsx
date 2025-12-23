@@ -6,14 +6,15 @@ const Hero = () => {
   return (
     <Container id="home">
       <Stack
-        direction={{ xs: "column", md: "row" }}
+        direction={{ xs: "column", md: "row"}}
         spacing={2}
         sx={{
         
           width: "100%",
-            minHeight: "55vh",
+            minHeight: "30vh",
           justifyContent: "center",
           alignItems: "center",
+          mt:4
         }}
       >
         <Box
@@ -26,23 +27,23 @@ const Hero = () => {
             gap: ".5rem",
             textAlign: "center",
           }}
-        >
-          <Typography
-            variant="h1"
-            sx={{ fontSize: { xs: "3rem", md: "4rem" } }}
-          >
-            Tech for Everyone
-          </Typography>
-          <Typography
-            variant="h3"
-            sx={{ fontSize: { xs: "1rem", md: "1.5rem" } }}
-          >
-            The Tech revolution strated since 2021
-          </Typography>
+        ><Typography
+  variant="h1"
+  sx={{ fontSize: { xs: "3rem", md: "3rem" } }}
+>
+  Empower Your Tech Skills
+</Typography>
+<Typography
+  variant="h3"
+  sx={{ fontSize: { xs: "1rem"} }}
+>
+  Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis nulla ducimus deserunt consectetur, aliquid eligendi explicabo aliquam quis, expedita ad tenetur eius mandatory.
+</Typography>
 
-          <Button variant="contained" color="secondary" href="#tech">
-            Explore Now
-          </Button>
+<Button variant="contained" color="secondary" href="#tech">
+  Browse Courses
+</Button>
+
         </Box>
         <Box
         sx={{width:"50%",padding:2,textAlign:"center"}}

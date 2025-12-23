@@ -78,6 +78,8 @@ const Chat = ({ currentUser }) => {
 
   // Socket listeners
   useEffect(() => {
+    socket.emit("getOldMessages");
+
     socket.on("oldMessages", (oldMessages) => {
       setMessages(oldMessages);
     });
@@ -87,9 +89,6 @@ const Chat = ({ currentUser }) => {
     });
 
     socket.on("userTyping", (data) => {
-      console.log('==================braodcast data==================');
-      console.log(data);
-      console.log('==================braodcast data==================');
       if (data.user !== currentUser) {
         setTypingUsers((prev) => {
           if (!prev.includes(data.user)) {
@@ -115,7 +114,7 @@ const Chat = ({ currentUser }) => {
   // Handle typing indicator
   const handleTyping = () => {
     console.log('=================handleTyping===================');
-    console.log(handleTyping);
+    console.log(newMessage);
     console.log('=================handleTyping===================');
 
     socket.emit("typing", { user: currentUser });
@@ -126,7 +125,14 @@ const Chat = ({ currentUser }) => {
 
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit("stopTyping");
+      console.log('===================stopTyping=================');
+      console.log(typingTimeoutRef);
+    
     }, 1000);
+
+    console.log('==================typingTimeoutRef==================');
+    console.log(typingTimeoutRef);
+    console.log('==================typingTimeoutRef==================');
   };
 
   // Send message

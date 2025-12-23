@@ -69,37 +69,27 @@ const io = new Server(server, {
 // Store online users
 const onlineUsers = new Map();
 
-console.log("=================onlineUsers 1===================");
-console.log(onlineUsers);
-console.log("=================onlineUsers 1===================");
-
 io.on("connection", async (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("User connected: socket ==>", socket, "socket id ==>", socket.id);
 
   // Handle user registration
   socket.on("register", async (username) => {
-    // console.log('=================socket.id===================');
-    // console.log(socket);
-    // console.log(socket.id);
-    // console.log('=================socket.id===================');
-
     onlineUsers.set(socket.id, username);
     io.emit("onlineUsers", Array.from(onlineUsers.values()));
-    // try {
-    //   const messages = await Message.find().sort({ timestamp: 1 }).limit(100);
-    //   socket.emit("oldMessages", messages);
-    // } catch (error) {
-    //   console.error("Error fetching messages:", error);
-    // }
+    console.log("=================emit users===================");
   });
 
   // Send old messages
-  try {
-    const messages = await Message.find().sort({ timestamp: 1 }).limit(100);
-    socket.emit("oldMessages", messages);
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-  }
+  socket.on("getOldMessages", async () => {
+    try {
+      const messages = await Message.find().sort({ timestamp: 1 }).limit(100);
+      socket.emit("oldMessages", messages);
+      console.log("================oldMessages get by on ====================");
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      console.log("================oldMessages error====================");
+    }
+  });
 
   // Handle new messages
   socket.on("sendMessage", async (data) => {

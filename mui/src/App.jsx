@@ -6,6 +6,7 @@ import { ThemeProvider } from "@mui/material";
 import theme from "./assets/theme";
 import Hero from "./components/Hero";
 import Courses from "./components/Courses";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Navbar />
         <Hero/>
         <Courses/>
+        <Footer/>
       </ThemeProvider>
     </>
   );

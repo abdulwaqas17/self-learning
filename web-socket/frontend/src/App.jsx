@@ -31,7 +31,7 @@ function App() {
     if (savedUser) {
       setCurrentUser(savedUser);
       setIsLoggedIn(true);
-      socket.emit("register", savedUser);
+      socket.emit("register",savedUser)
     }
   }, []);
 

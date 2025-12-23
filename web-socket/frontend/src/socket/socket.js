@@ -14,6 +14,7 @@ export const socket = io(SOCKET_URL, {
   reconnectionDelay: 1000,
 });
 
+
 // Socket event handlers
 export const connectSocket = () => {
   if (!socket.connected) {

@@ -1,0 +1,205 @@
+REACT HOOK FROM
+
+## 🔄 **1. Ye `data` kahan se aata hai?**
+
+```js
+const handleAddCompany = async (data) => {
+  // data yahan milta hai
+}
+```
+
+👉 Ye `data` **form ke input fields ka collected data** hota hai.
+
+Lekin aap ne kaha: “**hum ne to pass hi nahi kiya**”, to fir ye `data` aaya kaise?
+
+---
+
+## 🔗 **2. Kis ne `handleAddCompany(data)` ko call kiya?**
+
+Yahan pe magic line hai:
+
+```jsx
+<form onSubmit={handleSubmit(onSubmit)}>
+```
+
+Yahan:
+
+* `handleSubmit()` ek wrapper function hai jo:
+
+  * form validation check karta hai (React Hook Form ke rules ke base pe),
+  * agar saari fields sahi hoon, **tab** aapka `onSubmit` function **call karta hai** aur **`data` pass karta hai**.
+
+---
+
+### 🧠 Summary:
+
+```jsx
+handleSubmit(onSubmit)
+```
+
+➡️ is a wrapper that:
+
+1. Gathers and validates form values from fields registered via `register(...)`.
+2. Then calls `onSubmit(formData)` if valid.
+3. Aapka `onSubmit = handleAddCompany` hai, to woh call ho jata hai is tarah:
+
+```js
+handleAddCompany(validatedFormData);
+```
+
+---
+
+## ✅ **3. Ye line kya kar rahi hai?**
+
+```js
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm();
+```
+
+### 📌 Breakdown:
+
+| Keyword            | Kya karta hai                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `useForm()`        | React Hook Form ka main hook hai. Yeh form manage karta hai.                          |
+| `register()`       | Har input field ko register karta hai taake uska data React Hook Form track kare.     |
+| `handleSubmit()`   | Form submit handler wrap karta hai (validation ke saath).                             |
+| `formState.errors` | Validation errors ko store karta hai. Aap isse conditionally messages dikha sakte ho. |
+
+---
+
+## ✳️ **4. Ye naam zaroori hain kya?**
+
+**Nahi**, ye naam **customizable hain**:
+
+```js
+const {
+  register: customRegister,
+  handleSubmit: customSubmit,
+  formState: { errors: formErrors },
+} = useForm();
+```
+
+Lekin:
+
+* `register` aur `handleSubmit` React Hook Form ka **standard API** hai.
+* Inka syntax match hona chahiye jab aap form fields aur submit handle karo.
+
+---
+
+## 📌 Example ka Flow:
+
+```jsx
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm();
+
+const handleAddCompany = (data) => {
+  console.log(data); // 🤯 yahan milega full validated form ka object
+};
+
+<form onSubmit={handleSubmit(handleAddCompany)}>
+  <input {...register("companyName")} />
+  <input {...register("companyEmail")} />
+  ...
+</form>
+```
+
+**Form submit karte hi:**
+
+1. `handleSubmit()` check karega ke koi field invalid to nahi.
+2. Agar sab theek hai to `handleAddCompany(formData)` call karega.
+3. `data` mein sare input values mil jaenge.
+
+---
+
+## 🔚 Summary in Roman Urdu:
+
+* `handleAddCompany(data)` ko call karta hai `handleSubmit(...)`.
+* `data` woh object hota hai jo form fields se collect hota hai.
+* `useForm()` se `register`, `handleSubmit`, `errors` milte hain form management ke liye.
+* Ye naam default hain, lekin rename bhi kiye ja sakte hain.
+* Aapke saare inputs `register(...)` ke zariye track ho rahe hain.
+* Jab form submit hota hai, `handleSubmit()` validation check kar ke aapka `onSubmit` function call karta hai.
+
+---
+
+Agar aap chahein to main console mein `data` ka actual structure bhi dikha sakta hoon, ya `onBlur`, `onChange`, `defaultValues`, `watch()` jaise advanced topics bhi samjha sakta hoon.
+
+
+
+
+
+
+
+
+## 🔍 Pehla confusion:
+
+**"Ye `data` parameter kahan se aaya? Hum ne to pass hi nahi kiya!"**
+
+### 🔑 Jawab:
+
+Jee bhai, `data` aap manually **pass nahi karte**, ye **React Hook Form** khud deta hai jab aap `handleSubmit(...)` se form submit karwate hain.
+
+---
+
+## ⚙️ Step-by-Step Flow:
+
+### 1. 🔧 Aap ka yeh likhna:
+
+```js
+<form onSubmit={handleSubmit(handleAddCompany)}>
+```
+
+### 2. 📥 Iska matlab:
+
+Jab form submit hoga, `handleSubmit()` function pehle:
+
+* Sare `register()` wale fields ka data **collect** karega
+* Us data ko validate karega (e.g. required, pattern)
+* Agar sab kuch sahi ho gaya to:
+  👉 `handleAddCompany(data)` **ko call karega**, jahan `data` me form ka validated result hoga
+
+---
+
+## 🧪 Example:
+
+```js
+<input {...register("companyName")} />
+<input {...register("companyEmail")} />
+```
+
+User ne likha:
+
+* companyName: `"Waqas Inc"`
+* companyEmail: `"waqas@gmail.com"`
+
+✅ Jab form submit hoga, to:
+
+```js
+handleAddCompany({
+  companyName: "Waqas Inc",
+  companyEmail: "waqas@gmail.com",
+  ...
+})
+```
+
+Yeh **React Hook Form** khud kar raha hota hai. Aap manually pass nahi karte.
+
+---
+
+## 🔄 Summary:
+
+| Part                     | Explanation                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `handleSubmit(...)`      | React Hook Form ka function jo form ka data validate karke aap ke `onSubmit` handler ko deta hai |
+| `handleAddCompany(data)` | Aapka function jo validated data handle karta hai                                                |
+| `data`                   | Wo object hai jisme **register kiye gaye** fields ka data hota hai (React Hook Form deta hai)    |
+
+---
+
+Agar aap chahein to me is par chhota sa animated diagram ya real-time code sandbox bhi bana sakta hun for clarity.

@@ -1,0 +1,20 @@
+Faraq (Difference):
+
+API ek broad term hai. Har woh cheez jo do softwares ko connect kare, API kehlati hai.
+REST API API ka ek type hai. Ye specific rules (REST architectural style) ko follow karti hai, jiski wajah se ye web services ke liye bohot popular aur efficient hai.
+Simple terms mein:
+Har REST API, API hoti hai, lekin har API, REST API nahi hoti. REST API ek "specific type" ya "style" hai API ka.
+
+Isi tarah, API bhi har us tareeqay ko kehte hain jahan do software aapas mein "baat" kar saken. Ye communication kisi bhi shakal mein ho sakti hai: chahe woh aapke computer ke andar do programs baat kar rahe hon, ya internet par, ya kisi special tareeqay se. Har woh "interface" jo programs ko connect kare, woh API hai.
+Ab, REST API bilkul "Meetha Anaar" ki tarah hai.
+
+Jab hum "Meetha Anaar" kehte hain, toh hum "Anaar" ki ek khaas qism ki baat kar rahe hotay hain. Ye Anaar toh hai, lekin iski ek khaas sifat (property) hai: ye meetha hai.
+Isi tarah, REST API bhi API ki ek khaas qism hai. Ye API toh hai, lekin ye kuch khaas qanoon (rules ya "architectural style") follow karti hai. Ye qanoon ise web services ke liye ideal banate hain. Jaise:
+Ye internet ke standard tareeqay (HTTP) use karti hai.
+Ye har request ko azaad (stateless) rakhti hai.
+Ye data ko standard formats (JSON/XML) mein bhejti hai.
+
+Ye mostly HTTP (Hypertext Transfer Protocol) use karti hai (jo web browsers use karte hain).
+Ye stateless hoti hai, matlab har request apne aap mein mukammal hoti hai, server ko pichli requests ki koi information yaad nahi rakhni padti.
+Ye resources (jaise user data, products) ko URLs ke zariye identify karti hai.
+JSON ya XML jaise formats mein data send aur receive karti hai.

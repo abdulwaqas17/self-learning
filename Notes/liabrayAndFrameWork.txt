@@ -1,0 +1,129 @@
+__________________________________________ Library and Framework __________________________________________________
+
+
+### ✅ **Library kya hoti hai?**
+
+**Definition:**
+Library ek collection hoti hai **reusable functions or utilities** ki — jo aap apne project me import karke **specific task solve** karte ho.
+
+**Use case:** Aap decide karte ho **kab aur kahan use karna hai**. Control aapke paas hota hai.
+
+**Daily Life Example:**
+Socho aap pizza bana rahe ho 🍕 — aur market se **ready-made cheese** le aate ho. Aap decide karte ho usse kab aur kitna use karna hai.
+
+**Examples in code:**
+
+* `bcrypt.js` – password hash karna
+* `lodash` – utility functions
+* `axios` – HTTP requests
+* `moment.js` – date/time manage karna
+
+---
+
+### ✅ **Framework kya hota hai?**
+
+**Definition:**
+Framework ek **complete structure** deta hai jisme aapko **specific rules aur architecture** follow karna hota hai. Ye aapke liye bohot kuch manage karta hai — **routing, server, file structure, build system, etc.**
+
+**Use case:** Framework decide karta hai ke aapke code ka flow kya hoga. **Control zyada tar uske paas hota hai.**
+
+**Daily Life Example:**
+Socho aap McDonald's ka franchise chala rahe ho 🍟 — aapko unke rules, kitchen layout, uniform, aur process follow karna hota hai. Aap creative ho sakte ho, but boundary ke andar.
+
+**Examples in code:**
+
+* `Next.js` – React-based fullstack framework
+* `Express.js` – backend ke liye lightweight framework
+* `Laravel` – PHP framework
+* `Django` – Python framework
+
+---
+
+### 🔍 **Aapka Answer ka Review:**
+
+| Point                                              | Status | Feedback                                                                        |
+| -------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| **"Library is built-in code placed on npm"**       | ✅      | Correct. Bas "built-in" ki jagah "open-source reusable code" kehna better hota. |
+| **"Written by another coder"**                     | ✅      | Bilkul sahi. Most libraries community ya developer banate hain.                 |
+| **"We import & use when needed"**                  | ✅      | Excellent point — yeh key difference hai.                                       |
+| **"Framework is a structure we must work inside"** | ✅      | Sahi concept pakra hai. A to Z workflow define karta hai.                       |
+| **"Next.js is a framework"**                       | ✅      | 100% correct example.                                                           |
+
+### ⭐ Final Rating:
+
+**8.5 / 10**
+Bahut achhi samajh hai bhai! Bas thoda language polish aur real-world analogy strong karo — taake **interviews ya team discussion me confidently explain** kar sako.
+
+---
+
+### 🔚 Islamic/Motivational Thought:
+
+**"Ilm woh noor hai jo amal ke bina roshan nahi hota."**
+Jo seekh rahe ho, usay use karo, practice karo — wahi farq dalega. 💡
+
+Aap mashAllah right track pe ho — Allah aapko kamyabi de har field me. Ameen.
+
+
+
+
+
+
+apply khn se kia
+experience
+field (front,back) kis ki base pr 
+practical or not
+interview questions
+first question
+correct question
+wrong question
+english/urdu
+intorduction
+un ka response, at the end
+
+
+
+dailog flow,
+email to intership
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
