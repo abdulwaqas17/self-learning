@@ -88,11 +88,11 @@ const Chat = ({ currentUser }) => {
       setMessages((prev) => [...prev, message]);
     });
 
-    socket.on("userTyping", (data) => {
-      if (data.user !== currentUser) {
+    socket.on("userTyping", (user) => {
+      if (user !== currentUser) {
         setTypingUsers((prev) => {
-          if (!prev.includes(data.user)) {
-            return [...prev, data.user];
+          if (!prev.includes(user)) {
+            return [...prev, user];
           }
           return prev;
         });
@@ -113,11 +113,11 @@ const Chat = ({ currentUser }) => {
 
   // Handle typing indicator
   const handleTyping = () => {
-    console.log('=================handleTyping===================');
+    console.log("=================handleTyping===================");
     console.log(newMessage);
-    console.log('=================handleTyping===================');
+    console.log("=================handleTyping===================");
 
-    socket.emit("typing", { user: currentUser });
+    socket.emit("typing", currentUser);
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
@@ -125,14 +125,13 @@ const Chat = ({ currentUser }) => {
 
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit("stopTyping");
-      console.log('===================stopTyping=================');
+      console.log("===================stopTyping=================");
       console.log(typingTimeoutRef);
-    
     }, 1000);
 
-    console.log('==================typingTimeoutRef==================');
-    console.log(typingTimeoutRef);
-    console.log('==================typingTimeoutRef==================');
+    console.log("==================typingTimeoutRef==================");
+    console.log(typingTimeoutRef.current);
+    console.log("==================typingTimeoutRef==================");
   };
 
   // Send message
@@ -147,7 +146,7 @@ const Chat = ({ currentUser }) => {
 
     socket.emit("sendMessage", messageData);
     setNewMessage("");
-    
+
     // Stop typing indicator
     socket.emit("stopTyping");
     if (typingTimeoutRef.current) {
@@ -165,7 +164,10 @@ const Chat = ({ currentUser }) => {
 
   // Format time
   const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return new Date(date).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -180,7 +182,9 @@ const Chat = ({ currentUser }) => {
             <h2 className="font-semibold">Group Chat</h2>
             <p className="text-sm text-gray-600">
               {typingUsers.length > 0
-                ? `${typingUsers.join(", ")} ${typingUsers.length === 1 ? "is" : "are"} typing...`
+                ? `${typingUsers.join(", ")} ${
+                    typingUsers.length === 1 ? "is" : "are"
+                  } typing...`
                 : "Online"}
             </p>
           </div>
@@ -188,7 +192,7 @@ const Chat = ({ currentUser }) => {
         <div className="flex space-x-4">
           <button className="text-gray-600 hover:text-green-600">
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </button>
         </div>
@@ -198,14 +202,21 @@ const Chat = ({ currentUser }) => {
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
         {messages.map((message, index) => {
           const isCurrentUser = message.user === currentUser;
-          const showAvatar = index === 0 || messages[index - 1]?.user !== message.user;
+          const showAvatar =
+            index === 0 || messages[index - 1]?.user !== message.user;
 
           return (
             <div
               key={index}
-              className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+              className={`flex ${
+                isCurrentUser ? "justify-end" : "justify-start"
+              }`}
             >
-              <div className={`flex max-w-xs md:max-w-md lg:max-w-lg ${isCurrentUser ? "flex-row-reverse" : ""}`}>
+              <div
+                className={`flex max-w-xs md:max-w-md lg:max-w-lg ${
+                  isCurrentUser ? "flex-row-reverse" : ""
+                }`}
+              >
                 {!isCurrentUser && showAvatar && (
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-200 flex items-center justify-center mt-1 mr-2">
                     <span className="text-xs font-semibold text-green-800">
@@ -213,19 +224,26 @@ const Chat = ({ currentUser }) => {
                     </span>
                   </div>
                 )}
-                
+
                 <div className={`${isCurrentUser ? "mr-2" : "ml-2"}`}>
                   {!isCurrentUser && showAvatar && (
-                    <span className="text-xs text-gray-600 mb-1 block">{message.user}</span>
+                    <span className="text-xs text-gray-600 mb-1 block">
+                      {message.user}
+                    </span>
                   )}
                   <div
-                    className={`p-3 rounded-2xl ${isCurrentUser
-                      ? "bg-green-100 text-gray-800 rounded-tr-none"
-                      : "bg-white border border-gray-200 rounded-tl-none"
+                    className={`p-3 rounded-2xl ${
+                      isCurrentUser
+                        ? "bg-green-100 text-gray-800 rounded-tr-none"
+                        : "bg-white border border-gray-200 rounded-tl-none"
                     }`}
                   >
                     <p className="text-sm">{message.text}</p>
-                    <div className={`text-xs mt-1 ${isCurrentUser ? "text-green-600" : "text-gray-500"} text-right`}>
+                    <div
+                      className={`text-xs mt-1 ${
+                        isCurrentUser ? "text-green-600" : "text-gray-500"
+                      } text-right`}
+                    >
                       {formatTime(message.timestamp || message.createdAt)}
                     </div>
                   </div>
@@ -242,10 +260,10 @@ const Chat = ({ currentUser }) => {
         <div className="flex items-center space-x-2">
           <button className="p-2 text-gray-600 hover:text-green-600">
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
           </button>
-          
+
           <div className="flex-1 bg-gray-100 rounded-full px-4 py-2">
             <input
               type="text"
@@ -259,17 +277,18 @@ const Chat = ({ currentUser }) => {
               className="w-full bg-transparent focus:outline-none"
             />
           </div>
-          
+
           <button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
-            className={`p-3 rounded-full ${newMessage.trim()
-              ? "bg-green-500 hover:bg-green-600"
-              : "bg-gray-300 cursor-not-allowed"
+            className={`p-3 rounded-full ${
+              newMessage.trim()
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-gray-300 cursor-not-allowed"
             } text-white transition duration-200`}
           >
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
             </svg>
           </button>
         </div>

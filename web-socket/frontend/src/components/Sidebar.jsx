@@ -5,11 +5,8 @@ const Sidebar = ({ currentUser, onLogout }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
+    socket.emit("getOnlineUsers");
     socket.on("onlineUsers", (users) => {
-      console.log('==================users==================');
-      console.log(users);
-      console.log('==================users==================');
-      // Filter out current user from online users list
       const otherUsers = users.filter(user => user !== currentUser);
       setOnlineUsers(otherUsers);
     });

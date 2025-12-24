@@ -22,6 +22,8 @@ import { socket } from "./socket/socket";
 import Login from "./components/Login";
 
 function App() {
+  console.log("App.jsx Render");
+  
   const [currentUser, setCurrentUser] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
