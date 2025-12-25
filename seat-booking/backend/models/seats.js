@@ -30,7 +30,7 @@ const seatSchema = new mongoose.Schema(
       lockBy: {
         type: String, // user email
       },
-      lockTime: {
+      expiresAt: {
         type: Date, // expiry time
       },
     },

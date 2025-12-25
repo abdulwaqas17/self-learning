@@ -24,7 +24,7 @@ const confirmSeat = async (req, res) => {
       });
     }
 
-    // ❌ Seat must be locked
+    //  Seat must be locked
     if (findSeat.status !== "locked") {
       return res.status(400).json({
         success: false,
@@ -32,7 +32,7 @@ const confirmSeat = async (req, res) => {
       });
     }
 
-    // ❌ Only locker can confirm
+    //  Only locker can confirm
     if (findSeat.lockedTime?.lockBy !== loggedUser.email) {
       return res.status(403).json({
         success: false,
@@ -41,9 +41,15 @@ const confirmSeat = async (req, res) => {
     }
 
     const currentTime = new Date();
+    console.log("currentTime",currentTime);
+    console.log("findSeat.lockedTime.expiresAt",findSeat.lockedTime.expiresAt);
+    
 
-    // ❌ Lock expired
-    if (!findSeat.lockedTime?.lockTime || currentTime > findSeat.lockedTime.lockTime) {
+    //  Lock expired
+    if (
+      !findSeat.lockedTime?.expiresAt ||
+      currentTime > findSeat.lockedTime.expiresAt
+    ) {
       findSeat.status = "available";
       findSeat.lockedTime = undefined;
       await findSeat.save();
@@ -54,7 +60,7 @@ const confirmSeat = async (req, res) => {
       });
     }
 
-    // ✅ Confirm booking
+    //  Confirm booking
     findSeat.status = "booked";
     findSeat.lockedTime = undefined;
 

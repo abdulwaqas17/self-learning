@@ -40,6 +40,10 @@ export default function LoginPage() {
       }, 1000);
 
     } catch (error) {
+      console.log('================error====================');
+      console.log(error);
+      console.log(error.message);
+      console.log('================error====================');
       toast.error(error.message);
     } finally {
       setLoading(false);

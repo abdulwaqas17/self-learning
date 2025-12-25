@@ -24,7 +24,7 @@ const seatBook = async (req, res) => {
       });
     }
 
-    // ❌ Already booked or locked
+    //  Already booked or locked
     if (["locked", "booked"].includes(findSeat.status)) {
       return res.status(400).json({
         success: false,
@@ -32,7 +32,7 @@ const seatBook = async (req, res) => {
       });
     }
 
-    // ❌ Gender mismatch
+    //  Gender mismatch
     if (findSeat.seatGender !== loggedUser.gender) {
       return res.status(400).json({
         success: false,
@@ -40,17 +40,22 @@ const seatBook = async (req, res) => {
       });
     }
 
-    // ✅ Lock seat for 2 minutes
+    //  Lock seat for 2 minutes
     const lockExpiryTime = new Date(Date.now() + 2 * 60 * 1000);
 
+    console.log("lockExpiryTime",lockExpiryTime);
+    
+    
     findSeat.status = "locked";
     findSeat.lockedTime = {
       lockBy: loggedUser.email,
-      lockTime: lockExpiryTime,
+      expiresAt: lockExpiryTime,
     };
 
     await findSeat.save();
 
+    console.log("findSeat",findSeat);
+    
     return res.status(201).json({
       success: true,
       message: `Seat locked successfully for ${loggedUser.email}`,

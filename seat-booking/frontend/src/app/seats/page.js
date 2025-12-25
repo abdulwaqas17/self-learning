@@ -3,6 +3,22 @@
 import { bookSeat, confirmSeat, getSeats } from "@/services/seatServices";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+
+/* =========================
+   Decode token helper
+========================= */
+const getLoggedInUser = () => {
+ 
+  const token = localStorage.getItem("userToken");
+  if (!token) return null;
+
+  try {
+    return jwtDecode(token); // { email, gender, ... }
+  } catch {
+    return null;
+  }
+};
 
 export default function SeatsPage() {
   const [seats, setSeats] = useState([]);
@@ -12,13 +28,22 @@ export default function SeatsPage() {
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  // Get user email from localStorage for checking locked seats
-  const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
+  /* =========================
+     Logged-in user (from token)
+  ========================= */
+  const user = getLoggedInUser();
+  console.log("user",user);
+  
+  const userEmail = user?.email || null;
+  const userGender = user?.gender || null;
 
+  /* =========================
+     Fetch seats
+  ========================= */
   const fetchSeats = async () => {
     try {
       const res = await getSeats();
-      setSeats(res.data || res);
+      setSeats(res.data);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -30,9 +55,14 @@ export default function SeatsPage() {
     fetchSeats();
   }, []);
 
-  // STEP 1: Lock seat
+  /* =========================
+     STEP 1: Lock seat
+  ========================= */
   const handleBookSeat = async (seat) => {
-    const loggedUserEmail = localStorage.getItem("userEmail"); // Or from context/login
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
 
     const isConfirm = window.confirm(
       `Are you sure you want to book ${seat.seatName}?`
@@ -45,9 +75,6 @@ export default function SeatsPage() {
       const res = await bookSeat({ seatID: seat._id });
       toast.success(res.message || "Seat locked successfully!");
 
-      // ✅ Set userEmail in localStorage to track locked seats
-      localStorage.setItem("userEmail", loggedUserEmail || "me@example.com"); // Replace with real email from login
-
       setSelectedSeat(seat);
       setConfirmModalOpen(true);
       fetchSeats();
@@ -58,7 +85,9 @@ export default function SeatsPage() {
     }
   };
 
-  // STEP 2: Confirm booking
+  /* =========================
+     STEP 2: Confirm booking
+  ========================= */
   const handleConfirmSeat = async () => {
     if (!selectedSeat) return;
 
@@ -77,7 +106,9 @@ export default function SeatsPage() {
     }
   };
 
-  // Re-open confirm modal
+  /* =========================
+     Reopen confirm modal
+  ========================= */
   const reopenConfirmModal = (seat) => {
     setSelectedSeat(seat);
     setConfirmModalOpen(true);
@@ -98,7 +129,13 @@ export default function SeatsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {seats.map((seat) => {
           const isLockedByMe =
-            seat.status === "locked" && seat.lockedTime?.lockBy === userEmail;
+            seat.status === "locked" &&
+            seat.lockedTime?.lockBy === userEmail;
+
+          const isGenderMismatch =
+            userGender &&
+            seat.seatGender &&
+            seat.seatGender !== userGender;
 
           return (
             <div
@@ -116,26 +153,29 @@ export default function SeatsPage() {
                 Seat #{seat.seatNum}
               </h2>
 
-              <p>
-                <b>Name:</b> {seat.seatName}
-              </p>
-              <p>
-                <b>Gender:</b> {seat.seatGender}
-              </p>
-
+              <p><b>Name:</b> {seat.seatName}</p>
+              <p><b>Gender:</b> {seat.seatGender}</p>
               <p className="mt-1">
-                <b>Status:</b>{" "}
-                <span className="font-semibold">{seat.status}</span>
+                <b>Status:</b> <span className="font-semibold">{seat.status}</span>
               </p>
 
               {/* AVAILABLE */}
               {seat.status === "available" && (
                 <button
                   onClick={() => handleBookSeat(seat)}
-                  disabled={bookingId === seat._id}
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                  disabled={bookingId === seat._id || isGenderMismatch}
+                  className={`mt-4 w-full py-2 rounded-lg text-white
+                    ${
+                      isGenderMismatch
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
                 >
-                  {bookingId === seat._id ? "Booking..." : "Book Seat"}
+                  {isGenderMismatch
+                    ? "Not Allowed"
+                    : bookingId === seat._id
+                    ? "Booking..."
+                    : "Book Seat"}
                 </button>
               )}
 
@@ -165,7 +205,7 @@ export default function SeatsPage() {
 
       {/* CONFIRM MODAL */}
       {confirmModalOpen && selectedSeat && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-3">Confirm Booking</h2>
 
