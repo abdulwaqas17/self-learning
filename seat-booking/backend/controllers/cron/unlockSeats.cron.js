@@ -17,8 +17,10 @@ const unlockExpiredSeats = async () => {
     }
   );
 
+  global.io.emit("seatUpdated");
+
   console.log("Expired locked seats unlocked");
 };
 
 // ⏱ Runs every 30 seconds
-cron.schedule("*/30 * * * * *", unlockExpiredSeats); 
+cron.schedule("*/60 * * * * *", unlockExpiredSeats);

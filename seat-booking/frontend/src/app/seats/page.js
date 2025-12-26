@@ -4,12 +4,12 @@ import { bookSeat, confirmSeat, getSeats } from "@/services/seatServices";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
+import socket from "../../socket/socket";
 
 /* =========================
    Decode token helper
 ========================= */
 const getLoggedInUser = () => {
- 
   const token = localStorage.getItem("userToken");
   if (!token) return null;
 
@@ -32,8 +32,8 @@ export default function SeatsPage() {
      Logged-in user (from token)
   ========================= */
   const user = getLoggedInUser();
-  console.log("user",user);
-  
+  console.log("user", user);
+
   const userEmail = user?.email || null;
   const userGender = user?.gender || null;
 
@@ -52,7 +52,16 @@ export default function SeatsPage() {
   };
 
   useEffect(() => {
+
+    socket.on("seatUpdated", () => {
+      fetchSeats();
+    });
+
     fetchSeats();
+
+    return ()=> {
+      socket.off("seatUpdated")
+    }
   }, []);
 
   /* =========================
@@ -76,7 +85,9 @@ export default function SeatsPage() {
       toast.success(res.message || "Seat locked successfully!");
 
       setSelectedSeat(seat);
+
       setConfirmModalOpen(true);
+
       fetchSeats();
     } catch (error) {
       toast.error(error.message);
@@ -129,13 +140,10 @@ export default function SeatsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {seats.map((seat) => {
           const isLockedByMe =
-            seat.status === "locked" &&
-            seat.lockedTime?.lockBy === userEmail;
+            seat.status === "locked" && seat.lockedTime?.lockBy === userEmail;
 
           const isGenderMismatch =
-            userGender &&
-            seat.seatGender &&
-            seat.seatGender !== userGender;
+            userGender && seat.seatGender && seat.seatGender !== userGender;
 
           return (
             <div
@@ -153,10 +161,15 @@ export default function SeatsPage() {
                 Seat #{seat.seatNum}
               </h2>
 
-              <p><b>Name:</b> {seat.seatName}</p>
-              <p><b>Gender:</b> {seat.seatGender}</p>
+              <p>
+                <b>Name:</b> {seat.seatName}
+              </p>
+              <p>
+                <b>Gender:</b> {seat.seatGender}
+              </p>
               <p className="mt-1">
-                <b>Status:</b> <span className="font-semibold">{seat.status}</span>
+                <b>Status:</b>{" "}
+                <span className="font-semibold">{seat.status}</span>
               </p>
 
               {/* AVAILABLE */}

@@ -66,6 +66,8 @@ const confirmSeat = async (req, res) => {
 
     await findSeat.save();
 
+    global.io.emit("seatUpdated");
+
     return res.status(200).json({
       success: true,
       message: "Seat confirmed successfully.",

@@ -43,9 +43,8 @@ const seatBook = async (req, res) => {
     //  Lock seat for 2 minutes
     const lockExpiryTime = new Date(Date.now() + 2 * 60 * 1000);
 
-    console.log("lockExpiryTime",lockExpiryTime);
-    
-    
+    console.log("lockExpiryTime", lockExpiryTime);
+
     findSeat.status = "locked";
     findSeat.lockedTime = {
       lockBy: loggedUser.email,
@@ -54,8 +53,10 @@ const seatBook = async (req, res) => {
 
     await findSeat.save();
 
-    console.log("findSeat",findSeat);
-    
+    global.io.emit("seatUpdated");
+
+    console.log("findSeat", findSeat);
+
     return res.status(201).json({
       success: true,
       message: `Seat locked successfully for ${loggedUser.email}`,

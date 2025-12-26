@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema(
       enum: ["male", "female", "other"],
       required: [true, "Gender is required"],
     },
+    refreshToken : {
+      type: String,
+      select: false
+    }
 
   },
   { timestamps: true }
