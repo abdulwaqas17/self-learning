@@ -6,14 +6,17 @@ const api = axios.create({
 });
 
 api.interceptors.response.use(
-  res => res,
-  async error => {
+  (res) => res,
+  async (error) => {
     const originalRequest = error.config;
 
-    console.log("api.interceptors.response",error);
-    
+    console.log("api.interceptors.response", error);
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      error.response?.data?.message === "Invalid token" &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       const res = await api.post("/auth/refresh-token");

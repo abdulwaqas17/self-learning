@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded; // decoded data (id, email,role etc.)
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token." });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 

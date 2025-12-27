@@ -23,4 +23,4 @@ const unlockExpiredSeats = async () => {
 };
 
 // ⏱ Runs every 30 seconds
-cron.schedule("*/60 * * * * *", unlockExpiredSeats);
+cron.schedule("0 */1 * * * *", unlockExpiredSeats);
