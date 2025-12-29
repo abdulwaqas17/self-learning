@@ -14,10 +14,6 @@ export const createUser = async (req, res) => {
     // Upload image to S3
     const imageUrl = await uploadToS3(file);
 
-    console.log("new Date().toISOString()",new Date().toISOString());
-    console.log("new Date()",new Date());
-    
-
     // Save user to DynamoDB
     const user = {
       user_id: uuid(),

@@ -6,6 +6,10 @@ export const getUsers = async (req, res) => {
     // 1️⃣ Check Redis first
     const cachedUsers = await redisClient.get("users");
 
+    console.log('=================cachedUsers===================');
+    console.log(cachedUsers);  
+    console.log('=================cachedUsers===================');
+
     if (cachedUsers) {
       console.log("⚡ Data from Redis");
       return res.status(200).json({
@@ -18,7 +22,7 @@ export const getUsers = async (req, res) => {
     console.log("🐢 Data from DynamoDB");
 
     const data = await dynamoDB
-      .scan({ TableName: "Users" })
+      .scan({ TableName: "users" })
       .promise();
 
     // 3️⃣ Save to Redis (cache for 60 seconds)
@@ -27,6 +31,10 @@ export const getUsers = async (req, res) => {
       60, // seconds
       JSON.stringify(data.Items)
     );
+
+    console.log('==================data==================');
+    console.log(data);
+    console.log('==================data==================');
 
     res.status(200).json({
       source: "dynamodb",
