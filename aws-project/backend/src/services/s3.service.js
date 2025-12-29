@@ -1,5 +1,9 @@
 import { s3 } from "../config/aws.js";
 import { v4 as uuid } from "uuid";
+
+console.log('================process.env.S3_BUCKET_NAME333====================');
+console.log(process.env.S3_BUCKET_NAME);
+console.log('================process.env.S3_BUCKET_NAME===================='); 
  
 export const uploadToS3 = async (file) => {
   const params = {
