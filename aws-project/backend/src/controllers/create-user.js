@@ -23,19 +23,19 @@ export const createUser = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-   const newUser = await dynamoDB.put({
-      TableName: "users",
-      Item: user,
-    }).promise();
+    const newUser = await dynamoDB
+      .put({
+        TableName: "users",
+        Item: user,
+      })
+      .promise();
 
-    console.log("newUser ===============>",newUser);
-    
+    console.log("newUser ===============>", newUser);
 
     res.status(201).json({
       message: "User created with image",
       user,
     });
-
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
