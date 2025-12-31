@@ -21,16 +21,18 @@ export const getUsers = async (req, res) => {
     // 2️⃣ If not in Redis → fetch from DynamoDB
     console.log("🐢 Data from DynamoDB");
 
-    const data = await dynamoDB
-      .scan({ TableName: "users" })
-      .promise();
+  
+    const data = await dynamoDB.scan({
+      TableName:"users"
+     }).promise();
 
     // 3️⃣ Save to Redis (cache for 60 seconds)
     await redisClient.setEx(
       "users",
-      60, // seconds
+      60,  // seconds
       JSON.stringify(data.Items)
-    );
+
+    )
 
     console.log('==================data==================');
     console.log(data);

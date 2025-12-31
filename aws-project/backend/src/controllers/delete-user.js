@@ -143,13 +143,22 @@ export const deleteUser = async (req, res) => {
           console.log('=================Image reupload===================');
       }
 
-      throw dbError;
+      
+      console.log('==================dbError==================');
+      console.log(dbError.message);
+      console.log('==================dbError==================');
+      throw dbError
+      // throw new Error(`This error occurs ${dbError.message}`);
     }
 
     return res.status(200).json({
       message: "User and image deleted successfully",
+
     });
   } catch (error) {
+    console.log('=================error===================');
+    console.log(error);
+    console.log('=================error===================');
     return res.status(500).json({
       message: "Delete failed, nothing changed",
       error: error.message,
