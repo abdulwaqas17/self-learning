@@ -197,7 +197,7 @@ export const updateUser = async (req, res) => {
         })
         .promise();
     }
-
+ 
     return res.status(200).json({
       message: "User updated successfully",
       user: result.Attributes,
