@@ -11,13 +11,13 @@ export const usersApi = createApi({
 
   endpoints: (builder) => ({
 
-    // 🔹 GET USERS
+    // GET USERS
     getUsers: builder.query({
       query: () => "/get",
       providesTags: ["Users"],
     }),
 
-    // 🔹 CREATE USER
+    // CREATE USER
     createUser: builder.mutation({
       query: (formData) => ({
         url: "/add",
@@ -27,7 +27,7 @@ export const usersApi = createApi({
       invalidatesTags: ["Users"],
     }),
 
-    // 🔹 UPDATE USER
+    // UPDATE USER
     updateUser: builder.mutation({
       query: ({ user_id, formData }) => ({
         url: `/update/${user_id}`,
@@ -37,7 +37,7 @@ export const usersApi = createApi({
       invalidatesTags: ["Users"],
     }),
 
-    // 🔹 DELETE USER
+    // DELETE USER
     deleteUser: builder.mutation({
       query: (user_id) => ({
         url: `/delete/${user_id}`,
@@ -48,7 +48,7 @@ export const usersApi = createApi({
   }),
 });
 
-// 🔥 Auto-generated hooks
+// Auto-generated hooks
 export const {
   useGetUsersQuery,
   useCreateUserMutation,

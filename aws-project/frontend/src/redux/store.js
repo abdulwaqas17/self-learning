@@ -3,7 +3,6 @@ import { usersApi } from "./services/usersApi";
 
 console.log('================usersApi====================');
 
-
 export const store = configureStore({
   reducer: {
     [usersApi.reducerPath]: usersApi.reducer,
