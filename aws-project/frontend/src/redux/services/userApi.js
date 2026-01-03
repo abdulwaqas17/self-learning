@@ -4,14 +4,13 @@ export const usersApi = createApi({
   reducerPath: "usersApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/users", // apna backend URL
+    baseUrl: "http://localhost:5000/api/users", // backend URL
   }),
 
   tagTypes: ["Users"],
 
   endpoints: (builder) => ({
 
-    // GET USERS
     getUsers: builder.query({
       query: () => "/get",
       providesTags: ["Users"],
@@ -48,7 +47,6 @@ export const usersApi = createApi({
   }),
 });
 
-// Auto-generated hooks
 export const {
   useGetUsersQuery,
   useCreateUserMutation,
