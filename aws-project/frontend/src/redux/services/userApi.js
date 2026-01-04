@@ -16,7 +16,7 @@ export const usersApi = createApi({
       providesTags: ["Users"],
     }),
 
-    // CREATE USER
+    // Create user
     createUser: builder.mutation({
       query: (formData) => ({
         url: "/add",
