@@ -2,6 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import { usersApi } from "./services/userApi";
 
 console.log('================usersApi====================');
+console.log(usersApi);
+console.log('================usersApi====================');
 
 export const store = configureStore({
   reducer: {
