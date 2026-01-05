@@ -24,7 +24,12 @@ import { useRouter } from 'next/navigation';
 
 export default function UsersManagement() {
   const navigate = useRouter();
-  const { data: usersData, isLoading, isError, refetch } = useGetUsersQuery();
+  const { data, isLoading, isError, refetch } = useGetUsersQuery();
+  const usersData = data?.users || [];
+  console.log('==================hello1==================');
+  console.log('==================useGetUsersQuery()==================');
+  console.log(useGetUsersQuery());
+  console.log('==================useGetUsersQuery()==================');
   const [deleteUser] = useDeleteUserMutation();
   
   const [searchTerm, setSearchTerm] = useState('');
