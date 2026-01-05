@@ -19,7 +19,6 @@ import {
   UserX,
   Loader2
 } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
 import { useDeleteUserMutation, useGetUsersQuery } from '@/redux/services/userApi';
 import { useRouter } from 'next/navigation';
 
