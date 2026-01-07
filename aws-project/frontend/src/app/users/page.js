@@ -333,7 +333,7 @@ export default function UsersManagement() {
             </button>
 
             <button
-              onClick={() => router.push("/users/add")}
+              onClick={() => router.push("/users/create")}
               className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 font-medium shadow-lg shadow-blue-500/25"
             >
               <Plus className="w-5 h-5" />
