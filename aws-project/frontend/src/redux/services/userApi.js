@@ -11,9 +11,13 @@ export const usersApi = createApi({
 
   endpoints: (builder) => ({
 
+
+
     getUsers: builder.query({
+      
       query: () => "/get",
       providesTags: ["Users"],
+    
     }),
 
     // Create user
