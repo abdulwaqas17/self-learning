@@ -48,7 +48,7 @@ export const createUser = async (req, res) => {
     // 3️⃣ Save user to DynamoDB
     await dynamoDB
       .put({
-        TableName: "user",
+        TableName: "users",
         Item: user,
         ConditionExpression: "attribute_not_exists(email)", // optional safety
       })

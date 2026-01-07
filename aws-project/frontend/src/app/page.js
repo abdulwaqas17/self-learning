@@ -144,7 +144,7 @@ export default function LandingPage() {
             {/* CTA Button */}
             <div className="hidden md:block">
               <Link
-                href="/dashboard"
+                href="/users"
                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center"
               >
                 <Users className="w-4 h-4 mr-2" />
@@ -178,7 +178,7 @@ export default function LandingPage() {
                   Contact
                 </a>
                 <Link
-                  href="/dashboard"
+                  href="/users"
                   className="bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold px-6 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition flex items-center justify-center"
                 >
                   <Users className="w-4 h-4 mr-2" />
@@ -211,7 +211,7 @@ export default function LandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link 
-                href="/dashboard"
+                href="/users"
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
               >
                 <Users className="w-5 h-5 mr-2" />
@@ -383,7 +383,7 @@ export default function LandingPage() {
               </div>
               
               <Link 
-                href="/dashboard"
+                href="/users"
                 className="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg"
               >
                 <span>🚀 Access Dashboard</span>
@@ -467,7 +467,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/dashboard"
+                href="/users"
                 className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center"
               >
                 <Users className="w-5 h-5 mr-2" />
@@ -564,7 +564,7 @@ export default function LandingPage() {
       {/* Floating Action Button for Mobile */}
       <div className="fixed bottom-6 right-6 md:hidden">
         <Link
-          href="/dashboard"
+          href="/users"
           className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 flex items-center justify-center"
         >
           <Users className="w-6 h-6" />

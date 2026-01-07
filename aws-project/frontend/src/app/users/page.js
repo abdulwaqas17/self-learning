@@ -65,7 +65,7 @@ export default function UsersManagement() {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUser(userId).unwrap();
-        refetch();
+        // refetch();
         setShowActionsDropdown(null);
       } catch (error) {
         console.error("Failed to delete user:", error);

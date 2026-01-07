@@ -27,9 +27,11 @@ export default function AddUserPage() {
   const router = useRouter();
   const [createUser, { isLoading }] = useCreateUserMutation();
 
-  console.log('==================useCreateUserMutation()==================');
+  console.log("==================useCreateUserMutation()==================");
   console.log(useCreateUserMutation());
-  console.log('==================useCreateUserMutation()==================');
+  console.log(isLoading);
+
+  console.log("==================useCreateUserMutation()==================");
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -179,14 +181,15 @@ export default function AddUserPage() {
         formDataToSend.append("image", profileImage);
       }
 
-      console.log('=================apiCall before===================');
-    const apiCall =  await createUser(formDataToSend).unwrap();
-    console.log(apiCall);
-    console.log('=================apiCall after===================');
+      console.log("=================apiCall before===================");
+      const apiCall = await createUser(formDataToSend).unwrap();
+      console.log(apiCall);
+      console.log("=================apiCall after===================");
 
       toast.success("User created successfully!");
       router.push("/users");
     } catch (error) {
+      console.log("=================error comes in create===================");
       console.error("Error creating user:", error);
       toast.error(error?.data?.message || "Failed to create user");
     }
