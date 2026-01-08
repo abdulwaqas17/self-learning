@@ -11,7 +11,6 @@ import {
   Calendar,
   MapPin,
   Shield,
-  Building,
   Users,
   Eye,
   EyeOff,
@@ -26,12 +25,6 @@ import { toast } from "react-hot-toast";
 export default function AddUserPage() {
   const router = useRouter();
   const [createUser, { isLoading }] = useCreateUserMutation();
-
-  console.log("==================useCreateUserMutation()==================");
-  console.log(useCreateUserMutation());
-  console.log(isLoading);
-
-  console.log("==================useCreateUserMutation()==================");
 
   const [formData, setFormData] = useState({
     userName: "",
@@ -57,31 +50,19 @@ export default function AddUserPage() {
       value: "user",
       label: "User",
       icon: User,
-      color: "bg-gray-100 text-gray-700",
+      color: "bg-gray-50 text-gray-700 border-gray-200",
     },
     {
       value: "admin",
       label: "Admin",
       icon: Shield,
-      color: "bg-red-100 text-red-700",
+      color: "bg-red-50 text-red-700 border-red-200",
     },
     {
       value: "manager",
       label: "Manager",
       icon: Users,
-      color: "bg-purple-100 text-purple-700",
-    },
-    {
-      value: "branch-head",
-      label: "Branch Head",
-      icon: Building,
-      color: "bg-blue-100 text-blue-700",
-    },
-    {
-      value: "area-manager",
-      label: "Area Manager",
-      icon: Building,
-      color: "bg-indigo-100 text-indigo-700",
+      color: "bg-purple-50 text-purple-700 border-purple-200",
     },
   ];
 
@@ -95,7 +76,6 @@ export default function AddUserPage() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!["image/jpeg", "image/jpg", "image/png"].includes(file.type)) {
       setErrors((prev) => ({
         ...prev,
@@ -104,7 +84,6 @@ export default function AddUserPage() {
       return;
     }
 
-    // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
@@ -122,7 +101,6 @@ export default function AddUserPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -138,7 +116,7 @@ export default function AddUserPage() {
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = "Enter a valid email";
     }
 
     if (!profileImage) {
@@ -146,7 +124,7 @@ export default function AddUserPage() {
     }
 
     if (formData.password && formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = "Minimum 6 characters required";
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -162,72 +140,57 @@ export default function AddUserPage() {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      toast.error("Please fix the errors in the form");
+      toast.error("Please fix the errors");
       return;
     }
 
     try {
       const formDataToSend = new FormData();
 
-      // Append form fields
       Object.keys(formData).forEach((key) => {
         if (formData[key] !== "") {
           formDataToSend.append(key, formData[key]);
         }
       });
 
-      // Append profile image
       if (profileImage) {
         formDataToSend.append("image", profileImage);
       }
 
-      console.log("=================apiCall before===================");
-      const apiCall = await createUser(formDataToSend).unwrap();
-      console.log(apiCall);
-      console.log("=================apiCall after===================");
-
+      await createUser(formDataToSend).unwrap();
       toast.success("User created successfully!");
       router.push("/users");
     } catch (error) {
-      console.log("=================error comes in create===================");
-      console.error("Error creating user:", error);
+      console.error("Error:", error);
       toast.error(error?.data?.message || "Failed to create user");
     }
   };
 
   const handleCancel = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to cancel? All changes will be lost."
-      )
-    ) {
+    if (window.confirm("Discard changes and go back?")) {
       router.push("/users");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 p-4">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <button
           onClick={() => router.push("/users")}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 hover:bg-white px-3 py-2 rounded-lg"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="font-medium">Back to Users</span>
         </button>
 
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-blue-600 rounded-lg shadow-sm">
-            <User className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-600 rounded-lg">
+            <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Add New User
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Create a new user account with specific permissions
-            </p>
+            <h1 className="text-xl font-bold text-gray-900">Add New User</h1>
+            <p className="text-gray-600 text-sm">Create a new user account</p>
           </div>
         </div>
       </div>
@@ -235,18 +198,15 @@ export default function AddUserPage() {
       <div className="max-w-6xl mx-auto">
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Profile & Status */}
+            {/* Left Column */}
             <div className="lg:col-span-1 space-y-6">
-              {/* Profile Picture Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  Profile Picture
-                </h2>
+              {/* Profile Picture */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Profile Picture</h3>
 
-                <div className="flex flex-col items-center mb-6">
+                <div className="flex flex-col items-center">
                   <div className="relative mb-4">
-                    <div className="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden">
+                    <div className="w-24 h-24 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100">
                       <img
                         src={profilePreview}
                         alt="Profile preview"
@@ -254,11 +214,9 @@ export default function AddUserPage() {
                       />
                     </div>
                     {errors.profileImage && (
-                      <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                        <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
-                          {errors.profileImage}
-                        </span>
-                      </div>
+                      <p className="mt-2 text-xs text-red-600 text-center">
+                        {errors.profileImage}
+                      </p>
                     )}
                   </div>
 
@@ -269,30 +227,27 @@ export default function AddUserPage() {
                       onChange={handleImageChange}
                       className="hidden"
                     />
-                    <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                       <Upload className="w-4 h-4" />
                       Upload Image
                     </div>
                   </label>
 
                   <p className="text-xs text-gray-500 mt-3 text-center">
-                    JPG, PNG or JPEG, max 5MB
+                    JPG, PNG up to 5MB
                   </p>
                 </div>
               </div>
 
-              {/* Role Selection Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  User Role
-                </h2>
+              {/* Role Selection */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-900 mb-4">User Role</h3>
 
                 <div className="space-y-2">
                   {roles.map((role) => (
                     <label
                       key={role.value}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${
                         formData.role === role.value
                           ? "border-blue-500 bg-blue-50"
                           : "border-gray-200 hover:bg-gray-50"
@@ -304,9 +259,9 @@ export default function AddUserPage() {
                         value={role.value}
                         checked={formData.role === role.value}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600"
                       />
-                      <div className={`p-2 rounded-lg ${role.color}`}>
+                      <div className={`p-2 rounded-lg ${role.color} border`}>
                         <role.icon className="w-4 h-4" />
                       </div>
                       <span className="font-medium">{role.label}</span>
@@ -315,97 +270,68 @@ export default function AddUserPage() {
                 </div>
               </div>
 
-              {/* Status Card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <UserCheck className="w-5 h-5" />
-                  Account Status
-                </h2>
+              {/* Status */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Account Status</h3>
 
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="isActive"
-                      value="true"
-                      checked={formData.isActive === true}
-                      onChange={() =>
-                        setFormData((prev) => ({ ...prev, isActive: true }))
-                      }
-                      className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
-                    />
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <div>
-                        <div className="font-medium">Active</div>
-                        <div className="text-xs text-gray-500">
-                          User can access the system
-                        </div>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="isActive"
-                      value="false"
-                      checked={formData.isActive === false}
-                      onChange={() =>
-                        setFormData((prev) => ({ ...prev, isActive: false }))
-                      }
-                      className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
-                    />
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                      <div>
-                        <div className="font-medium">Inactive</div>
-                        <div className="text-xs text-gray-500">
-                          User cannot access the system
-                        </div>
-                      </div>
-                    </div>
-                  </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, isActive: true }))
+                    }
+                    className={`flex-1 py-2.5 px-4 rounded-lg border text-sm font-medium ${
+                      formData.isActive
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    Active
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, isActive: false }))
+                    }
+                    className={`flex-1 py-2.5 px-4 rounded-lg border text-sm font-medium ${
+                      !formData.isActive
+                        ? "bg-gray-100 text-gray-700 border-gray-300"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    Inactive
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Form Fields */}
+            {/* Right Column */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  Personal Information
-                </h2>
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 className="font-semibold text-gray-900 mb-6">Personal Information</h3>
 
                 <div className="space-y-6">
-                  {/* Full Name & Email */}
+                  {/* Name & Email */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Full Name *
                       </label>
                       <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          <User className="w-4 h-4" />
-                        </div>
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type="text"
                           name="userName"
                           value={formData.userName}
                           onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                            errors.userName
-                              ? "border-red-300"
-                              : "border-gray-300"
-                          }`}
+                          className={`w-full pl-10 pr-3 py-2.5 text-sm border rounded-lg ${
+                            errors.userName ? "border-red-300" : "border-gray-300"
+                          } focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                           placeholder="John Doe"
                         />
                       </div>
                       {errors.userName && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.userName}
-                        </p>
+                        <p className="mt-1 text-xs text-red-600">{errors.userName}</p>
                       )}
                     </div>
 
@@ -414,24 +340,20 @@ export default function AddUserPage() {
                         Email Address *
                       </label>
                       <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          <Mail className="w-4 h-4" />
-                        </div>
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type="email"
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                          className={`w-full pl-10 pr-3 py-2.5 text-sm border rounded-lg ${
                             errors.email ? "border-red-300" : "border-gray-300"
-                          }`}
+                          } focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                           placeholder="john@example.com"
                         />
                       </div>
                       {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.email}
-                        </p>
+                        <p className="mt-1 text-xs text-red-600">{errors.email}</p>
                       )}
                     </div>
                   </div>
@@ -443,15 +365,13 @@ export default function AddUserPage() {
                         Phone Number
                       </label>
                       <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                          <Phone className="w-4 h-4" />
-                        </div>
+                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type="tel"
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                          className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="+1 (555) 000-0000"
                         />
                       </div>
@@ -465,7 +385,7 @@ export default function AddUserPage() {
                         name="gender"
                         value={formData.gender}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Select gender</option>
                         {genders.map((gender) => (
@@ -483,15 +403,13 @@ export default function AddUserPage() {
                       Date of Birth
                     </label>
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Calendar className="w-4 h-4" />
-                      </div>
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <input
                         type="date"
                         name="dateOfBirth"
                         value={formData.dateOfBirth}
                         onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -502,15 +420,13 @@ export default function AddUserPage() {
                       Address
                     </label>
                     <div className="relative">
-                      <div className="absolute left-3 top-3 text-gray-400">
-                        <MapPin className="w-4 h-4" />
-                      </div>
+                      <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                       <textarea
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
-                        rows="3"
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                        rows="2"
+                        className="w-full pl-10 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
                         placeholder="Enter complete address..."
                       />
                     </div>
@@ -519,16 +435,12 @@ export default function AddUserPage() {
               </div>
 
               {/* Password Section */}
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  Account Security
-                </h2>
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="font-semibold text-gray-900 mb-4">Password Settings</h3>
 
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-600">
-                    Set a password for the user. Leave blank if you want the
-                    user to set their own password via email invitation.
+                  <p className="text-sm text-gray-600 mb-4">
+                    Set a password for the user. Leave blank to send invitation email.
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -542,33 +454,22 @@ export default function AddUserPage() {
                           name="password"
                           value={formData.password}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                            errors.password
-                              ? "border-red-300"
-                              : "border-gray-300"
-                          }`}
-                          placeholder="••••••••"
+                          className={`w-full px-3 py-2.5 text-sm border rounded-lg ${
+                            errors.password ? "border-red-300" : "border-gray-300"
+                          } focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                          placeholder="Password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                         >
-                          {showPassword ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.password}
-                        </p>
+                        <p className="mt-1 text-xs text-red-600">{errors.password}</p>
                       )}
-                      <p className="mt-1 text-xs text-gray-500">
-                        Minimum 6 characters
-                      </p>
                     </div>
 
                     <div>
@@ -581,64 +482,43 @@ export default function AddUserPage() {
                           name="confirmPassword"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
-                          className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                            errors.confirmPassword
-                              ? "border-red-300"
-                              : "border-gray-300"
-                          }`}
-                          placeholder="••••••••"
+                          className={`w-full px-3 py-2.5 text-sm border rounded-lg ${
+                            errors.confirmPassword ? "border-red-300" : "border-gray-300"
+                          } focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                          placeholder="Confirm password"
                         />
                         <button
                           type="button"
-                          onClick={() =>
-                            setShowConfirmPassword(!showConfirmPassword)
-                          }
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                         >
-                          {showConfirmPassword ? (
-                            <EyeOff className="w-4 h-4" />
-                          ) : (
-                            <Eye className="w-4 h-4" />
-                          )}
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       {errors.confirmPassword && (
-                        <p className="mt-1 text-sm text-red-600">
-                          {errors.confirmPassword}
-                        </p>
+                        <p className="mt-1 text-xs text-red-600">{errors.confirmPassword}</p>
                       )}
                     </div>
                   </div>
 
-                  {/* Password Strength Indicator */}
+                  {/* Password Strength */}
                   {formData.password && (
                     <div className="mt-4">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-gray-700">
-                          Password Strength
-                        </span>
-                        <span
-                          className={`text-xs font-medium ${
-                            formData.password.length >= 6
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
+                        <span className="text-sm text-gray-700">Password Strength</span>
+                        <span className={`text-sm font-medium ${
+                          formData.password.length >= 6 ? "text-green-600" : "text-red-600"
+                        }`}>
                           {formData.password.length >= 6 ? "Strong" : "Weak"}
                         </span>
                       </div>
                       <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-300 ${
-                            formData.password.length >= 6
-                              ? "bg-green-500"
-                              : "bg-red-500"
+                          className={`h-full rounded-full ${
+                            formData.password.length >= 6 ? "bg-green-500" : "bg-red-500"
                           }`}
                           style={{
-                            width: `${Math.min(
-                              (formData.password.length / 6) * 100,
-                              100
-                            )}%`,
+                            width: `${Math.min((formData.password.length / 6) * 100, 100)}%`,
                           }}
                         ></div>
                       </div>
@@ -650,29 +530,27 @@ export default function AddUserPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-8 flex justify-end gap-4">
+          <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors flex items-center gap-2"
+              className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium"
             >
-              <X className="w-4 h-4" />
               Cancel
             </button>
-
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+              className={`px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${
                 isLoading
                   ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 shadow-sm"
+                  : "bg-blue-600 hover:bg-blue-700"
               } text-white`}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating User...
+                  Creating...
                 </>
               ) : (
                 <>
