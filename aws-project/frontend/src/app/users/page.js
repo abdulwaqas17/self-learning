@@ -29,6 +29,7 @@ import {
   useGetUsersQuery,
 } from "@/redux/services/userApi";
 import { useRouter } from "next/navigation";
+import EditUserModal from "@/components/EditModal";
 
 export default function UsersManagement() {
   const router = useRouter();
@@ -50,15 +51,34 @@ export default function UsersManagement() {
   const [showActionsDropdown, setShowActionsDropdown] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]);
 
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+    // Handle Edit User - Open Modal
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+    setShowActionsDropdown(null); // Close dropdown if open
+  };
+
+   // Handle modal close
+  const handleModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  // Handle modal success
+  // const handleModalSuccess = () => {
+  //   refetch(); // Refresh user list after successful update
+  // };
+
   // Handle View User
   const handleViewUser = (user) => {
     router.push(`/users/${user.user_id}`);
   };
 
-  // Handle Edit User
-  const handleEditUser = (user) => {
-    router.push(`/users/edit/${user.user_id}`);
-  };
+
 
   // Handle Delete User
   const handleDeleteUser = async (userId) => {
@@ -204,6 +224,7 @@ export default function UsersManagement() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       {/* Header Section */}
       <div className="mb-8">
@@ -625,13 +646,13 @@ export default function UsersManagement() {
                           <Eye className="w-4 h-4" />
                         </button>
 
-                        <button
-                          onClick={() => handleEditUser(user)}
-                          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Edit User"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
+                      <button
+          onClick={() => handleEditUser(user)}
+          className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+          title="Edit User"
+        >
+          <Edit className="w-4 h-4" />
+        </button>
 
                         <div className="relative">
                           <button
@@ -728,5 +749,15 @@ export default function UsersManagement() {
         )}
       </div>
     </div>
+     {/* Edit User Modal */}
+      {selectedUser && (
+        <EditUserModal
+          user={selectedUser}
+          isOpen={isEditModalOpen}
+          onClose={handleModalClose}
+          // onSuccess={handleModalSuccess}
+        />
+      )}
+    </>
   );
 }
