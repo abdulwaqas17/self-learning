@@ -1,6 +1,6 @@
 import api from "./api";
 
-
+ 
 // Register User Service Function
 export const registerUser = async (formData) => {
   try {

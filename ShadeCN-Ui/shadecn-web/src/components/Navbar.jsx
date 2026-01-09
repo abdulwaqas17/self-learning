@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 import { ModeToggle } from "./ThemeBtn";
 
 const Navbar = () => {
@@ -21,7 +21,7 @@ const Navbar = () => {
         {/* Logo - Waqas Blog's */}
         <div className="text-2xl font-extrabold tracking-wide">
           <Link href="/">
-            <span className="cursor-pointer  transition duration-300 ease-in-out">
+            <span className="cursor-pointer text-warning-foreground  transition duration-300 ease-in-out">
               Waqas Blog's
             </span>
           </Link>
@@ -29,102 +29,88 @@ const Navbar = () => {
 
         {/* Mobile menu button (Hamburger icon) */}
         <div className="md:hidden flex justify-center items-center">
-            <Sheet>
-  <SheetTrigger>
-    
-          <div
-            onClick={() => setIsOpen(!isOpen)}
-            className=" focus:outline-none focus:ring-2 focus:ring-gray-600 rounded-md"
-            aria-label="Toggle navigation"
-          >
-            <svg
-              className="w-7 h-7"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {isOpen ? (
-                // Close icon (X) when menu is open
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              ) : (
-                // Hamburger icon when menu is closed
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>
-              )}
-            </svg>
-          </div>
-  </SheetTrigger>
-  <SheetContent className={"text-center"}>
-    <SheetHeader>
-      <SheetTitle className={"font-bold my-4"}>Waqas Blog's</SheetTitle>
-      <SheetDescription>
-       <div className="flex flex-col gap-6">
-          <Link
-            href="/"
-            className=" transition duration-300 ease-in-out"
-          >
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className=" transition duration-300 ease-in-out"
-          >
-            About
-          </Link>
-          <Link
-            href="/blog"
-            className=" transition duration-300 ease-in-out"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/contact"
-            className=" transition duration-300 ease-in-out"
-          >
-            Contact
-          </Link>
+          <span className="mx-2">
+            <ModeToggle />
+          </span>
+          <Sheet>
+            <SheetTrigger>
+              <div
+                onClick={() => setIsOpen(!isOpen)}
+                className=" focus:outline-none focus:ring-2 focus:ring-gray-600 rounded-md"
+                aria-label="Toggle navigation"
+              >
+                <svg
+                  className="w-7 h-7"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  ></path>
+                </svg>
+              </div>
+            </SheetTrigger>
+            <SheetContent className={"text-center"}>
+              <SheetHeader>
+                <SheetTitle className={"font-bold my-4"}>
+                  Waqas Blog's
+                </SheetTitle>
+                <SheetDescription>
+                  <div className="flex flex-col gap-6">
+                    <Link
+                      href="/"
+                      className=" transition duration-300 ease-in-out"
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      href="/about"
+                      className=" transition duration-300 ease-in-out"
+                    >
+                      About
+                    </Link>
+                    <Link
+                      href="/blog"
+                      className=" transition duration-300 ease-in-out"
+                    >
+                      Blog
+                    </Link>
+                    <Link
+                      href="/contact"
+                      className=" transition duration-300 ease-in-out"
+                    >
+                      Contact
+                    </Link>
 
-          <div className="space-x-2 flex items-center justify-center">
-            <Button className="text-[12px]" variant="outline">Login</Button>
-            <Button className="text-[12px]" variant="outline">Sign Up</Button>
-            <ModeToggle/>
-          </div>
+                    <div className="space-x-2 flex items-center justify-center">
+                      <Button className="text-[12px]" variant="outline">
+                        Login
+                      </Button>
+                      <Button className="text-[12px]" variant="outline">
+                        Sign Up
+                      </Button>
+                    </div>
+                  </div>
+                </SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
         </div>
-      </SheetDescription>
-    </SheetHeader>
-  </SheetContent>
-</Sheet>
-        </div>
-
 
         {/* Desktop navigation links */}
         <div className="hidden md:flex items-center space-x-6 text-lg">
-          <Link
-            href="/"
-            className=" transition duration-300 ease-in-out"
-          >
+          <Link href="/" className=" transition duration-300 ease-in-out">
             Home
           </Link>
-          <Link
-            href="/about"
-            className=" transition duration-300 ease-in-out"
-          >
+          <Link href="/about" className=" transition duration-300 ease-in-out">
             About
           </Link>
-          <Link
-            href="/blog"
-            className=" transition duration-300 ease-in-out"
-          >
+          <Link href="/blog" className=" transition duration-300 ease-in-out">
             Blog
           </Link>
           <Link
@@ -137,7 +123,7 @@ const Navbar = () => {
           <div className="space-x-2 flex items-center">
             <Button variant="outline">Login</Button>
             <Button variant="outline">Sign Up</Button>
-            <ModeToggle/>
+            <ModeToggle />
           </div>
         </div>
       </div>

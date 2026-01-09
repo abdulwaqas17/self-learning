@@ -10,7 +10,7 @@ import {
   Home,
   Ticket,
   Info,
-  Contact,
+  Contact, 
   Menu,
   X,
   Lock,
