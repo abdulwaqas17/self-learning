@@ -260,9 +260,9 @@
 
 
 // ------------------- SPREAD/REST OPERATOR -------------------
-const obj1 = { a: 1, b: 2 };
-const obj2 = { key : {...obj1}, c: 3 };
-console.log(obj2); // { a:1, b:2, c:3 }
+// const obj1 = { a: 1, b: 2 };
+// const obj2 = { key : {...obj1}, c: 3 };
+// console.log(obj2); // { a:1, b:2, c:3 }
 
 
 // // // /*
@@ -279,3 +279,39 @@ console.log(obj2); // { a:1, b:2, c:3 }
 Ok thanks brother, I understand
 and stl ka environement ksa h, ager opportunity mili h to accept krni chahie ? 
 */
+
+
+
+
+
+
+
+
+
+// ---------------------- Asychronous/Synchronous JavaScript -----------------------
+console.log('Start');
+setTimeout(() => {
+  console.log('Timeout 1');
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('Promise 1');
+});
+
+setTimeout(() => {
+  console.log('Timeout 2');
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log('Promise 2');
+});
+
+console.log('End');
+
+// Expected Output:
+// Start
+// End
+// Promise 1
+// Promise 2
+// Timeout 1
+// Timeout 2

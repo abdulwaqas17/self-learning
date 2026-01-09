@@ -87,7 +87,12 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
+      console.log('=================before res===================');
       const res = await registerUser(formData);
+      console.log("==================>",res);
+      
+      console.log('=================after res ===================');
+   
       toast.success(res.message || "Account created successfully!");
       
       setTimeout(() => {
@@ -100,6 +105,8 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+
+   console.log('=================hello app1===================');
 
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-white via-orange-50 to-red-50 flex items-center justify-center p-4">

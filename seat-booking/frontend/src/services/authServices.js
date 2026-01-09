@@ -5,6 +5,9 @@ import api from "./api";
 export const registerUser = async (formData) => {
   try {
     const response = await api.post("/auth/register", formData);
+    console.log('====================================',response);
+    console.log('==================after response==================');
+  
     return response.data;
   } catch (error) {
     if (error.response?.data?.message) {
