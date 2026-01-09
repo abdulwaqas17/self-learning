@@ -16,7 +16,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false); // State to manage mobile menu visibility
 
   return (
-    <nav className="p-4 bg-background/50 sticky top-0 backdrop-blur border-b shadow-md">
+    <nav className="p-4 bg-background/50 sticky top-0 backdrop-blur border-b shadow-md z-10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo - Waqas Blog's */}
         <div className="text-2xl font-extrabold tracking-wide">
