@@ -1,5 +1,56 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+
+const articles = [
+  {
+    category: "Engineering",
+    title: "Building scalable UI systems with Tailwind CSS",
+    description:
+      "Learn how to design reusable UI components using Tailwind and CSS variables.",
+    date: "March 12, 2026",
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+  },
+  {
+    category: "Design",
+    title: "Design systems that scale with your product",
+    description:
+      "Best practices for building consistent and accessible design systems.",
+    date: "March 15, 2026",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
+  },
+  {
+    category: "Frontend",
+    title: "Modern UI patterns for React apps Solutions",
+    description:
+      "Explore modern UI patterns to improve usability and performance.",
+    date: "March 18, 2026",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998",
+  },
+  {
+    category: "Architecture",
+    title: "Microservices UI architecture explained",
+    description:
+      "Understand how microservices affect frontend architecture.",
+    date: "March 22, 2026",
+    image: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+  },
+  {
+    category: "CSS",
+    title: "Advanced Tailwind CSS techniques for developers",
+    description:
+      "Write cleaner, faster, and scalable Tailwind CSS code with these tips.",
+    date: "March 25, 2026",
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
+  },
+];
+
 
 export default function BlogSection() {
   return (
@@ -16,124 +67,58 @@ export default function BlogSection() {
           </p>
         </div>
 
-        {/* GRID */}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+<Carousel>
+  <CarouselContent>
+    {articles.map((item, index) => (
+      <CarouselItem
+        key={index}
+        className="md:basis-1/2 lg:basis-1/3"
+      >
+        <article className="group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl">
 
-          {/* CARD */}
-          <article className="group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl">
-            
-            {/* IMAGE */}
-            <div className="relative h-52 w-full">
-              <Image
-                src="https://images.unsplash.com/photo-1555066931-4365d14bab8c"
-                alt="Tailwind CSS UI"
-                fill
-                className="object-cover transition group-hover:scale-105"
-              />
-            </div>
+          {/* IMAGE */}
+          <div className="relative h-52 w-full">
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              className="object-cover transition group-hover:scale-105"
+            />
+          </div>
 
-            {/* CONTENT */}
-            <div className="p-6">
-              <span className="inline-block rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-                Engineering
+          {/* CONTENT */}
+          <div className="p-6">
+            <span className="inline-block rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+              {item.category}
+            </span>
+
+            <h3 className="mt-4 text-xl font-semibold text-foreground">
+              {item.title}
+            </h3>
+
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {item.description}
+            </p>
+
+            <div className="mt-6 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">
+                {item.date}
               </span>
 
-              <h3 className="mt-4 text-xl font-semibold text-foreground">
-                Building scalable UI systems with Tailwind CSS
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Learn how to design reusable UI components using Tailwind and
-                CSS variables.
-              </p>
-
-              <div className="mt-6 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  March 12, 2026
-                </span>
-
-                <span className="flex items-center gap-2 text-sm font-medium text-primary">
-                  Read more <ArrowRight className="h-4 w-4" />
-                </span>
-              </div>
-            </div>
-          </article>
-
-          {/* CARD */}
-          <article className="group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl">
-            <div className="relative h-52 w-full">
-              <Image
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
-                alt="Startup team"
-                fill
-                className="object-cover transition group-hover:scale-105"
-              />
-            </div>
-
-            <div className="p-6">
-              <span className="inline-block rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
-                Product
+              <span className="flex items-center gap-2 text-sm font-medium text-primary">
+                Read more <ArrowRight className="h-4 w-4" />
               </span>
-
-              <h3 className="mt-4 text-xl font-semibold text-foreground">
-                How startups ship faster without burning out
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Practical workflows used by modern SaaS teams to stay fast and
-                focused.
-              </p>
-
-              <div className="mt-6 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  February 28, 2026
-                </span>
-
-                <span className="flex items-center gap-2 text-sm font-medium text-primary">
-                  Read more <ArrowRight className="h-4 w-4" />
-                </span>
-              </div>
             </div>
-          </article>
+          </div>
+        </article>
+      </CarouselItem>
+    ))}
+  </CarouselContent>
 
-          {/* CARD */}
-          <article className="group overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-xl">
-            <div className="relative h-52 w-full">
-              <Image
-                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
-                alt="Dark mode design"
-                fill
-                className="object-cover transition group-hover:scale-105"
-              />
-            </div>
+  <CarouselPrevious />
+  <CarouselNext />
+</Carousel>
 
-            <div className="p-6">
-              <span className="inline-block rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
-                Design
-              </span>
-
-              <h3 className="mt-4 text-xl font-semibold text-foreground">
-                Designing perfect dark mode experiences
-              </h3>
-
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Learn contrast, accessibility, and UX principles for dark mode
-                design.
-              </p>
-
-              <div className="mt-6 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  January 19, 2026
-                </span>
-
-                <span className="flex items-center gap-2 text-sm font-medium text-primary">
-                  Read more <ArrowRight className="h-4 w-4" />
-                </span>
-              </div>
-            </div>
-          </article>
-
-        </div>
       </div>
     </section>
   );

@@ -20,9 +20,7 @@ export default function Home() {
 
       {/* Blog Section */}
       <BlogSection />
-
-      {/* Footer Section */}
-      <Footer />
+     
     </main>
   );
 }
