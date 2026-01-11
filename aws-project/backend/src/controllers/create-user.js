@@ -17,7 +17,7 @@ export const createUser = async (req, res) => {
 
     const file = req.file;
 
-    // 🔴 Basic validations
+    // Basic validations
     if (!userName || !email) {
       return res.status(400).json({ message: "userName and email are required" });
     }
@@ -26,26 +26,26 @@ export const createUser = async (req, res) => {
       return res.status(400).json({ message: "Profile image is required" });
     }
 
-    // 1️⃣ Upload image to S3
+    // 1 Upload image to S3
     const profileImage = await uploadToS3(file);
 
-    // 2️⃣ Create user object
+    // 2 Create user object
     const user = {
-      user_id: uuid(),                 // unique user id
-      userName,                            // full userName
-      email,                           // email address
-      phone: phone || null,            // phone number
-      role: role || "user",            // user / admin / manager
-      gender: gender || null,          // male / female / other
+      user_id: uuid(),                 
+      userName,                          
+      email,                          
+      phone: phone || null,            
+      role: role || "user",           
+      gender: gender || null,         
       dateOfBirth: dateOfBirth || null,
-      address: address || null,        // user address
-      profileImage,                    // S3 image URL
-      isActive: isActive ?? true,      // user active / inactive
+      address: address || null,     
+      profileImage,                    
+      isActive: isActive ?? true,    
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    // 3️⃣ Save user to DynamoDB
+    // 3 Save user to DynamoDB
     await dynamoDB
       .put({
         TableName: "users",
@@ -54,7 +54,7 @@ export const createUser = async (req, res) => {
       })
       .promise();
 
-    // 4️⃣ Response
+    // 4 Response
     res.status(201).json({
       message: "User created successfully",
       user,
