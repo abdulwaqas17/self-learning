@@ -4,15 +4,15 @@ import { redisClient } from "../config/redis.js";
 export const getUsers = async (req, res) => {
   try {
     // 1️⃣ Check Redis first
-    const cachedUsers = await redisClient.get("users");
+    // const cachedUsers = await redisClient.get("users");
 
-    if (cachedUsers) {
-      console.log("⚡ Data from Redis");
-      return res.status(200).json({
-        source: "redis",
-        users: JSON.parse(cachedUsers),
-      });
-    }
+    // if (cachedUsers) {
+    //   console.log("⚡ Data from Redis");
+    //   return res.status(200).json({
+    //     source: "redis",
+    //     users: JSON.parse(cachedUsers),
+    //   });
+    // }
 
     // 2️⃣ If not in Redis → fetch from DynamoDB
     console.log("🐢 Data from DynamoDB");
@@ -24,15 +24,15 @@ export const getUsers = async (req, res) => {
       .promise();
 
     // 3️⃣ Save to Redis (cache for 60 seconds)
-    const redisVar = await redisClient.setEx(
-      "users",
-      60, // seconds
-      JSON.stringify(data.Items)
-    );
+    // const redisVar = await redisClient.setEx(
+    //   "users",
+    //   60, // seconds
+    //   JSON.stringify(data.Items)
+    // );
 
-    console.log("==================redisVar==================");
-    console.log(redisVar);
-    console.log(cachedUsers);
+    // console.log("==================redisVar==================");
+    // console.log(redisVar);
+    // console.log(cachedUsers);
 
     console.log("==================redisVar==================");
 
