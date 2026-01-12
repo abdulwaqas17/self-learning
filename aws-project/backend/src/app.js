@@ -3,7 +3,12 @@ import userRoutes from "./routes/user.routes.js";
 import cors from "cors";
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+    {
+  origin: "*", // abhi testing ke liye
+  credentials: true
+}
+));
 app.use("/api/users", userRoutes); 
 
 export default app;

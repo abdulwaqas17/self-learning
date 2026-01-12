@@ -4,7 +4,7 @@ export const usersApi = createApi({
   reducerPath: "usersApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/users", // backend URL
+    baseUrl: "http://13.201.194.138:5000/api/users", // backend URL
   }),
 
   tagTypes: ["Users"],
