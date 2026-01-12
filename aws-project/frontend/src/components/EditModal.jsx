@@ -153,7 +153,7 @@ export default function EditUserModal({ user, isOpen, onClose }) {
       }
       
       if (profileImage) {
-        formDataToSend.append('profileImage', profileImage);
+        formDataToSend.append('image', profileImage);
       }
 
       await updateUser({ 
