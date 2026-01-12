@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import fs from "fs";
 
 const articles = [
   {
@@ -53,6 +54,10 @@ const articles = [
 
 
 export default function BlogSection() {
+  const dirContent = fs.readdirSync("content","utf-8")
+  const blogs = dirContent.map((file)=> {
+    const fileConetent = fs.readFileSync(`content/${file}`, 'utf-8')
+  })
   return (
     <section className="py-24 bg-background">
       <div className="container px-4 mx-auto">
