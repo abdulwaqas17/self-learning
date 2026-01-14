@@ -11,6 +11,6 @@ export function getBlogs() {
     const filePath = path.join(CONTENT_DIR, file);
     const fileContent = fs.readFileSync(filePath, "utf-8");
   const matterResult = matter(fileContent);
-  console.log("matterResult ============>",matterResult);
+  console.log("matterResult",matterResult);
 })
 }
