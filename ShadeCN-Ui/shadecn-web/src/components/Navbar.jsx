@@ -13,7 +13,7 @@ import {
 import { ModeToggle } from "./ThemeBtn";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false); // State to manage mobile menu visibility
+  const [isOpen, setIsOpen] = useState(false); // here is a State to manage mobile menu visibility
 
   return (
     <nav className="p-4 bg-background/50 sticky top-0 backdrop-blur border-b shadow-md z-10">
