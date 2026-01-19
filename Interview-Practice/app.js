@@ -332,7 +332,7 @@ and stl ka environement ksa h, ager opportunity mili h to accept krni chahie ?
 
 
 
-// ---------------------- Junior Node.js Developer Interview -----------------------
+// ---------------------- Junior Node.js Developer Interview Questions-----------------------
 let name = "Waqas"; 
 name[0] = "A";
 console.log(name); // Waqas
