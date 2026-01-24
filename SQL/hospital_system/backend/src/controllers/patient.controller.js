@@ -4,7 +4,6 @@ console.log('=================patientService===================');
 console.log(patientService);
 console.log('=================patientService===================');
 
-
 // create patient function
 export const createPatient = async (req, res) => {
   try {
