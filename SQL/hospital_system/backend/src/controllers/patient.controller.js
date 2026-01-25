@@ -1,33 +1,29 @@
 import * as patientService from "../services/patient.service.js";
+import { sendResponse } from "../utils/ApiResponse.js";
 
-console.log('=================patientService===================');
+console.log("=================patientService===================");
 console.log(patientService);
-console.log('=================patientService===================');
+console.log("=================patientService===================");
 
 // create patient function
 export const createPatient = async (req, res) => {
   try {
     const patientId = await patientService.createPatient(req.body);
-    res.status(201).json({
-      message: "Patient created successfully",
-      patientId,
-    });
+    sendResponse(res, 201, "Patient created successfully", { id: patientId });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // get all patients function
 export const getAllPatients = async (req, res) => {
   try {
     const patients = await patientService.getAllPatients();
-    res.status(200).json({data:patients, message: "Patients retrieved successfully" });
+    sendResponse(res, 200, "Patients fetched successfully", patients);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // update patient function
 export const updatePatient = async (req, res) => {
@@ -42,14 +38,11 @@ export const updatePatient = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      message: "Patient updated successfully",
-    });
+    sendResponse(res, 200, "Patient updated successfully");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // delete patient function
 export const deletePatient = async (req, res) => {
@@ -64,9 +57,7 @@ export const deletePatient = async (req, res) => {
       });
     }
 
-    res.status(200).json({
-      message: "Patient deleted successfully",
-    });
+    sendResponse(res, 200, "Patient deleted successfully");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

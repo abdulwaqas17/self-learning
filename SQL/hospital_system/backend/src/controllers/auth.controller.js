@@ -1,5 +1,6 @@
 import { loginUserService } from "../services/auth.service";
 import { ApiError } from "../utils/ApiError";
+import { sendResponse } from "../utils/ApiResponse";
 import { generateToken } from "../utils/jwt";
 
 export const login = async (req, res) => {
@@ -14,10 +15,7 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.json({
-      message: "Login successful",
-      token,
-    });
+    sendResponse(res, 200, "Login successful", { token });
   } catch (error) {
     next(error);
   }
