@@ -1,9 +1,6 @@
 import * as patientService from "../services/patient.service.js";
 import { sendResponse } from "../utils/ApiResponse.js";
 
-console.log("=================patientService===================");
-console.log(patientService);
-console.log("=================patientService===================");
 
 // create patient function
 export const createPatient = async (req, res) => {
