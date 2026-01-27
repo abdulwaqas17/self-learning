@@ -20,7 +20,6 @@ export const createPatient = async (data) => {
 // get all patients function
 export const getAllPatients = async ({ page, limit, search }) => {
   try {
-
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     const offset = (page - 1) * limit;
@@ -31,27 +30,28 @@ export const getAllPatients = async ({ page, limit, search }) => {
     const searchableFields = ["name", "phone", "gender", "address"];
 
     if (search) {
-      const conditions = searchableFields.map(
-        (field) => `${field} LIKE ?`
-      );
+      const conditions = searchableFields.map((field) => `${field} LIKE ?`);
+
       whereClause = `WHERE ${conditions.join(" OR ")}`;
-      values = searchableFields.map(() => `%${search}`);
+      values = searchableFields.map(() => `%${search}%`);
     }
 
+    // count
     const [countResult] = await db.execute(
       `SELECT COUNT(*) as total FROM patients ${whereClause}`,
-      values
+      values,
     );
 
     const totalRecords = countResult[0].total;
     const totalPages = Math.ceil(totalRecords / limit);
 
+    // data
     const [rows] = await db.execute(
       `SELECT * FROM patients
        ${whereClause}
        ORDER BY id DESC
-       LIMIT ? OFFSET ?`,
-      [...values, limit, offset]
+       LIMIT ${limit} OFFSET ${offset}`,
+      values,
     );
 
     return {
@@ -64,9 +64,7 @@ export const getAllPatients = async ({ page, limit, search }) => {
       },
     };
   } catch (error) {
-    console.log('===============error in p pagin=====================');
-    console.log(error);
-    console.log('===============error in p pagin=====================');
+    console.log("Pagination Error:", error);
     throw new ApiError(500, "Error fetching patients");
   }
 };
@@ -75,7 +73,7 @@ export const getAllPatients = async ({ page, limit, search }) => {
 export const getPatientById = async (id) => {
   const [rows] = await db.execute("SELECT * FROM patients WHERE id = ?", [id]);
   return rows[0];
-}
+};
 
 // update patient function
 export const updatePatient = async (id, data) => {

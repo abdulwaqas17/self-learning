@@ -11,11 +11,11 @@ export const createPatientSchema = Joi.object({
 
 
 export const updatePatientSchema = Joi.object({
-  name: Joi.string().min(3).optional(),
-  age: Joi.number().min(0).optional(),
-  gender: Joi.string().valid("Male", "Female").optional(),
-  phone: Joi.string().optional(),
-  address: Joi.string().optional(),
+  name: Joi.string().min(3).required(),
+  age: Joi.number().min(0).required(),
+  gender: Joi.string().valid("Male", "Female").required(),
+  phone: Joi.string().required(),
+  address: Joi.string().required(),
 });
 
 
