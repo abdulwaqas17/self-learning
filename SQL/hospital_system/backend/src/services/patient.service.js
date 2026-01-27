@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import bcrypt from "bcrypt";
+import { ApiError } from "../utils/ApiError.js";
 
 // create patient function
 export const createPatient = async (data) => {
@@ -17,9 +18,57 @@ export const createPatient = async (data) => {
 };
 
 // get all patients function
-export const getAllPatients = async () => {
-  const [rows] = await db.execute("SELECT * FROM patients");
-  return rows;
+export const getAllPatients = async ({ page, limit, search }) => {
+  try {
+
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+    const offset = (page - 1) * limit;
+
+    let whereClause = "";
+    let values = [];
+
+    const searchableFields = ["name", "phone", "gender", "address"];
+
+    if (search) {
+      const conditions = searchableFields.map(
+        (field) => `${field} LIKE ?`
+      );
+      whereClause = `WHERE ${conditions.join(" OR ")}`;
+      values = searchableFields.map(() => `%${search}`);
+    }
+
+    const [countResult] = await db.execute(
+      `SELECT COUNT(*) as total FROM patients ${whereClause}`,
+      values
+    );
+
+    const totalRecords = countResult[0].total;
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    const [rows] = await db.execute(
+      `SELECT * FROM patients
+       ${whereClause}
+       ORDER BY id DESC
+       LIMIT ? OFFSET ?`,
+      [...values, limit, offset]
+    );
+
+    return {
+      data: rows,
+      pagination: {
+        totalRecords,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    };
+  } catch (error) {
+    console.log('===============error in p pagin=====================');
+    console.log(error);
+    console.log('===============error in p pagin=====================');
+    throw new ApiError(500, "Error fetching patients");
+  }
 };
 
 // get patient by id function

@@ -15,8 +15,15 @@ export const createPatient = async (req, res, next) => {
 // get all patients function
 export const getAllPatients = async (req, res, next) => {
   try {
-    const patients = await patientService.getAllPatients();
-    sendResponse(res, 200, "Patients fetched successfully", patients);
+    const { page, limit, search } = req.query;
+
+    const result = await patientService.getAllPatients({
+      page,
+      limit,
+      search,
+    });
+
+    sendResponse(res, 200, "Patients fetched successfully", result);
   } catch (error) {
     next(error);
   }
