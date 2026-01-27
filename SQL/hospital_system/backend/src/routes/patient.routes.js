@@ -3,6 +3,7 @@ import {
   createPatient,
   deletePatient,
   getAllPatients,
+  getPatientById,
   updatePatient,
 } from "../controllers/patient.controller.js"; 
 
@@ -30,13 +31,13 @@ router.get(
   getAllPatients
 );
 
-// router.get(
-//   "/:id",
-//   authMiddleware,
-//   allowRoles(ROLES.ADMIN,ROLES.STAFF,ROLES.DOCTOR),
-//   validate(idParamSchema, "params"),
-//   getPatientById
-// );
+router.get(
+  "/get/:id",
+  authMiddleware,
+  allowRoles(ROLES.ADMIN,ROLES.STAFF,ROLES.DOCTOR),
+  validate(idParamSchema, "params"),
+  getPatientById
+);
 
 router.put(
   "/update/:id",

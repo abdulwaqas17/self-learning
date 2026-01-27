@@ -6,6 +6,7 @@ export const createPatientSchema = Joi.object({
   gender: Joi.string().valid("Male", "Female").required(),
   phone: Joi.string().required(),
   address: Joi.string().required(),
+  password: Joi.string().min(6).required()
 });
 
 

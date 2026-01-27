@@ -22,6 +22,12 @@ export const getAllPatients = async () => {
   return rows;
 };
 
+// get patient by id function
+export const getPatientById = async (id) => {
+  const [rows] = await db.execute("SELECT * FROM patients WHERE id = ?", [id]);
+  return rows[0];
+}
+
 // update patient function
 export const updatePatient = async (id, data) => {
   const { name, age, gender, phone, address, password } = data;
