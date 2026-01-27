@@ -4,7 +4,7 @@ import {
   deletePatient,
   getAllPatients,
   updatePatient,
-} from "../controllers/patient.controller.js";
+} from "../controllers/patient.controller.js"; 
 
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { allowRoles } from "../middlewares/role.middleware.js";
@@ -30,13 +30,13 @@ router.get(
   getAllPatients
 );
 
-router.get(
-  "/:id",
-  authMiddleware,
-  allowRoles(ROLES.ADMIN,ROLES.STAFF,ROLES.DOCTOR),
-  validate(idParamSchema, "params"),
-  getPatientById
-);
+// router.get(
+//   "/:id",
+//   authMiddleware,
+//   allowRoles(ROLES.ADMIN,ROLES.STAFF,ROLES.DOCTOR),
+//   validate(idParamSchema, "params"),
+//   getPatientById
+// );
 
 router.put(
   "/update/:id",

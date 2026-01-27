@@ -11,7 +11,8 @@ export const loginUserService = async (email, password) => {
 
   const user = rows[0];
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = password === user.password;
+  // const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return null;
 
   return user;

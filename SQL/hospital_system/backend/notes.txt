@@ -1,0 +1,7 @@
+mysql -u root -p hospital_system < migrations/008_update_status_in_appt.sql
+
+SHOW DATABASES;
+
+USE hospital_system;
+
+DESCRIBE users;
