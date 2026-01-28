@@ -1,8 +1,9 @@
-import db from "../config/database.js";
+import db from "../config/db.js";
 import bcrypt from "bcrypt";
 import { ROLES } from "../constants/roles.js";
 import { ApiError } from "../utils/ApiError.js";
 
+// create user service
 export const createUser = async (data) => {
   const connection = await db.getConnection();
 
@@ -62,5 +63,63 @@ export const createUser = async (data) => {
     throw error; // ApiError as it is
   } finally {
     connection.release();
+  }
+};
+
+// get all users service
+export const getAllUsers = async ({ page, limit, search, role }) => {
+  try {
+    if (!role) {
+      throw new ApiError(400, "Role is required");
+    }
+
+    page = Number(page) || 1;
+    limit = Number(limit) || 10;
+    const offset = (page - 1) * limit;
+
+    let whereClause = "WHERE role = ?";
+    let values = [role];
+
+    const searchableFields = ["name", "email"];
+
+    if (search) {
+      const conditions = searchableFields
+        .map(field => `${field} LIKE ?`)
+        .join(" OR ");
+
+      whereClause += ` AND (${conditions})`;
+      searchableFields.forEach(() => values.push(`%${search}%`));
+    }
+
+    // count query
+    const [countResult] = await db.execute(
+      `SELECT COUNT(*) as total FROM users ${whereClause}`,
+      values
+    );
+
+    const totalRecords = countResult[0].total;
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    // data query
+    const [rows] = await db.execute(
+      `SELECT * FROM users
+       ${whereClause}
+       ORDER BY id DESC
+       LIMIT ? OFFSET ?`,
+      [...values, limit, offset]
+    );
+
+    return {
+      data: rows,
+      pagination: {
+        totalRecords,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    };
+  } catch (error) {
+    console.log("Pagination Error:", error);
+    throw new ApiError(500, "Error fetching users");
   }
 };
