@@ -1,4 +1,5 @@
 import * as userService from "../services/users.service.js"
+import { ApiError } from "../utils/ApiError.js";
 import { sendResponse } from "../utils/ApiResponse.js";
 
 
@@ -8,9 +9,6 @@ export const createUser = async (req, res, next) => {
     const userId = await userService.createUser(req.body);
     sendResponse(res, 201, `${req.body.role} created successfully`, { id: userId });
   } catch (error) {
-    console.log('=================create user error===================');
-    console.log(error);
-    console.log('=================create user error===================');
     next(error);
   }
 };
@@ -28,6 +26,22 @@ export const getAllUsers = async (req, res, next) => {
     });
 
     sendResponse(res, 200, `${role}s fetched successfully`, result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// get user by id function
+export const getUserById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await userService.getUserById(id);
+
+    if (!user) {
+      throw new ApiError(404, "user not found");
+    }
+    sendResponse(res, 200, "User fetched successfully", user);
   } catch (error) {
     next(error);
   }

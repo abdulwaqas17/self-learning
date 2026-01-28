@@ -4,7 +4,8 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createUsersSchema, getUserQuerySchema } from "../validators/user.validator.js";
-import { createUser, getAllUsers } from "../controllers/user.controller.js";
+import { createUser, getAllUsers, getUserById } from "../controllers/user.controller.js";
+import { idParamSchema } from "../validators/global.validator.js";
 
 
 const router = express.Router();
@@ -21,10 +22,18 @@ router.get(
   "/get",
   authMiddleware,
   allowRoles(ROLES.ADMIN,ROLES.STAFF),
-  validate(getUserQuerySchema),
+  validate(getUserQuerySchema, "query"),
   getAllUsers,
 );
 
+
+router.get(
+  "/get/:id",
+  authMiddleware,
+  allowRoles(ROLES.ADMIN,ROLES.STAFF,ROLES.DOCTOR),
+  validate(idParamSchema, "params"),
+  getUserById,
+);
 
 
 export default router;

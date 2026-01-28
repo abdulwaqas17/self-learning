@@ -102,8 +102,8 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
       `SELECT * FROM users
        ${whereClause}
        ORDER BY id DESC
-       LIMIT ? OFFSET ?`,
-      [...values, limit, offset]
+       LIMIT ${limit} OFFSET ${offset}`,
+      [...values]
     );
 
     return {
@@ -119,4 +119,10 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
     console.log("Pagination Error:", error);
     throw new ApiError(500, "Error fetching users");
   }
+};
+
+// get user by id function
+export const getUserById = async (id) => {
+  const [rows] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
+  return rows[0];
 };

@@ -33,7 +33,5 @@ export const getUserQuerySchema = Joi.object({
   page: Joi.number().min(1).optional(),
   limit: Joi.number().min(1).max(100).optional(),
   search: Joi.string().optional(),
-  role: Joi.string()
-    .valid(ROLES.ADMIN, ROLES.DOCTOR, ROLES.STAFF)
-    .required()
+  role: Joi.string().valid(ROLES.ADMIN, ROLES.DOCTOR, ROLES.STAFF).required()
 });
