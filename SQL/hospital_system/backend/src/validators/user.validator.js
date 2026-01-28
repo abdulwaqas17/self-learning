@@ -35,3 +35,22 @@ export const getUserQuerySchema = Joi.object({
   search: Joi.string().optional(),
   role: Joi.string().valid(ROLES.ADMIN, ROLES.DOCTOR, ROLES.STAFF).required()
 });
+
+
+export const updateUsersSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  email: Joi.string().email().required(),
+
+  // Doctor-specific fields
+  department_id: Joi.number().when("role", {
+    is: ROLES.DOCTOR,
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
+
+  specialization: Joi.string().when("role", {
+    is: ROLES.DOCTOR,
+    then: Joi.required(),
+    otherwise: Joi.forbidden(),
+  }),
+});

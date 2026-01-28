@@ -15,7 +15,7 @@ export const createUser = async (data) => {
     // email check
     const [existing] = await connection.execute(
       "SELECT id FROM users WHERE email = ?",
-      [email]
+      [email],
     );
 
     if (existing.length > 0) {
@@ -26,7 +26,7 @@ export const createUser = async (data) => {
     if (role === ROLES.ADMIN) {
       const [admin] = await connection.execute(
         "SELECT id FROM users WHERE role = ?",
-        [ROLES.ADMIN]
+        [ROLES.ADMIN],
       );
 
       if (admin.length > 0) {
@@ -39,7 +39,7 @@ export const createUser = async (data) => {
     // insert user
     const [userResult] = await connection.execute(
       "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
-      [name, email, hashedPassword, role]
+      [name, email, hashedPassword, role],
     );
 
     const userId = userResult.insertId;
@@ -51,13 +51,12 @@ export const createUser = async (data) => {
       await connection.execute(
         `INSERT INTO doctors (user_id, department_id, hospital_id, specialization)
          VALUES (?, ?, ?, ?)`,
-        [userId, department_id, hospital_id, specialization]
+        [userId, department_id, hospital_id, specialization],
       );
     }
 
     await connection.commit();
     return userId;
-
   } catch (error) {
     await connection.rollback();
     throw error; // ApiError as it is
@@ -69,7 +68,6 @@ export const createUser = async (data) => {
 // get all users service
 export const getAllUsers = async ({ page, limit, search, role }) => {
   try {
-  
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     const offset = (page - 1) * limit;
@@ -81,7 +79,7 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
 
     if (search) {
       const conditions = searchableFields
-        .map(field => `${field} LIKE ?`)
+        .map((field) => `${field} LIKE ?`)
         .join(" OR ");
 
       whereClause += ` AND (${conditions})`;
@@ -91,7 +89,7 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
     // count query
     const [countResult] = await db.execute(
       `SELECT COUNT(*) as total FROM users ${whereClause}`,
-      values
+      values,
     );
 
     const totalRecords = countResult[0].total;
@@ -103,7 +101,7 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
        ${whereClause}
        ORDER BY id DESC
        LIMIT ${limit} OFFSET ${offset}`,
-      [...values]
+      [...values],
     );
 
     return {
@@ -121,8 +119,53 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
   }
 };
 
-// get user by id function
+// get user by id service
 export const getUserById = async (id) => {
   const [rows] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
   return rows[0];
+};
+
+// update user service
+export const updateUser = async (id, data) => {
+  const connection = db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+    const { name, email, role } = data;
+
+     // email check
+    const [existing] = await connection.execute(
+      "SELECT id FROM users WHERE email = ?",
+      [email],
+    );
+
+    if (existing.length > 0) {
+      throw new ApiError(409, "User with this email already exists");
+    }
+
+    const [result] = await connection.execute(
+      `UPDATE users 
+     SET name = ?, email = ?
+     WHERE id = ?`,
+      [name, email, id],
+    );
+
+    // doctor table update
+    if (role === ROLES.DOCTOR) {
+      const { specialization, department_id } = data;
+      await connection.execute(
+        "UPDATE doctors SET sepcialization = ?, department_id = ? where user_id = ?",
+        [specialization, department_id,id],
+      );
+    }
+
+    (await connection).commit();
+
+    return result.affectedRows;
+  } catch (error) {
+    (await connection).rollback();
+    throw error;
+  } finally {
+    (await connection).release()
+  }
 };
