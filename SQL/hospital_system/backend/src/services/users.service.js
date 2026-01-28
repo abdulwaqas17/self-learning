@@ -69,10 +69,7 @@ export const createUser = async (data) => {
 // get all users service
 export const getAllUsers = async ({ page, limit, search, role }) => {
   try {
-    if (!role) {
-      throw new ApiError(400, "Role is required");
-    }
-
+  
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     const offset = (page - 1) * limit;
