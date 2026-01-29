@@ -6,8 +6,8 @@ import { sendResponse } from "../utils/ApiResponse.js";
 // create user function
 export const createUser = async (req, res, next) => {
   try {
-    const userId = await userService.createUser(req.body);
-    sendResponse(res, 201, `${req.body.role} created successfully`, { id: userId });
+    const user = await userService.createUser(req.body);
+    sendResponse(res, 201, `${req.body.role} created successfully`,user );
   } catch (error) {
     next(error);
   }
@@ -38,9 +38,6 @@ export const getUserById = async (req, res, next) => {
     const { id } = req.params;
     const user = await userService.getUserById(id);
 
-    if (!user) {
-      throw new ApiError(404, "user not found");
-    }
     sendResponse(res, 200, "User fetched successfully", user);
   } catch (error) {
     next(error);

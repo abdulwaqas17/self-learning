@@ -43,6 +43,7 @@ export const createUser = async (data) => {
     );
 
     const userId = userResult.insertId;
+    let newUser;
 
     // doctor table insert
     if (role === ROLES.DOCTOR) {
@@ -53,10 +54,21 @@ export const createUser = async (data) => {
          VALUES (?, ?, ?, ?)`,
         [userId, department_id, hospital_id, specialization],
       );
+
+      
+      [[newUser]] = await connection.execute(
+        "SELECT u.id, u.name, u.email, u.role, d.specialization, d.department_id, d.hospital_id FROM users u INNER JOIN docors d ON u.id = d.user_id WHERE u.id = ?",
+        [userId],
+      );
+    } else {
+      [[newUser]] = await connection.execute(
+        "SELECT id, name, email, role FROM users WHERE id = ?",
+        [userId],
+      );
     }
 
     await connection.commit();
-    return userId;
+    return newUser;
   } catch (error) {
     await connection.rollback();
     throw error; // ApiError as it is
@@ -67,7 +79,7 @@ export const createUser = async (data) => {
 
 // get all users service
 export const getAllUsers = async ({ page, limit, search, role }) => {
-  try {
+
     page = Number(page) || 1;
     limit = Number(limit) || 10;
     const offset = (page - 1) * limit;
@@ -113,17 +125,34 @@ export const getAllUsers = async ({ page, limit, search, role }) => {
         limit,
       },
     };
-  } catch (error) {
-    console.log("Pagination Error:", error);
-    throw new ApiError(500, "Error fetching users");
-  }
+
 };
 
 // get user by id service
 export const getUserById = async (id) => {
-  const [rows] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
-  return rows[0];
+  let [[user]] = await db.execute(
+    "SELECT id, name, email, role FROM users WHERE id = ?",
+    [id]
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.role === ROLES.DOCTOR) {
+    const [[doctor]] = await db.execute(
+      "SELECT specialization, department_id, hospital_id FROM doctors WHERE user_id = ?",
+      [id]
+    );
+
+    if (doctor) {
+      user = { ...user, ...doctor };
+    }
+  }
+
+  return user;
 };
+
 
 // update user service
 export const updateUser = async (id, data) => {
@@ -174,7 +203,7 @@ export const updateUser = async (id, data) => {
       );
 
       [[updateUser]] = await connection.execute(
-        "SELECT u.id, u.name, u.email, u.role, d.sepcialization, d.department_id, d.hospital_id FROM users u LEFT JOIN docors d ON u.id = d.user_id WHERE u.id = ?",
+        "SELECT u.id, u.name, u.email, u.role, d.specialization, d.department_id, d.hospital_id FROM users u LEFT JOIN docors d ON u.id = d.user_id WHERE u.id = ?",
         [id],
       );
     } else {
