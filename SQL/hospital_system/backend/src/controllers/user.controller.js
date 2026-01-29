@@ -53,13 +53,9 @@ export const updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const updated = await userService.updateUser(id, req.body);
+    const updatedData = await userService.updateUser(id, req.body);
 
-    if (updated === 0) {
-      throw new ApiError(404, "User not found");
-    }
-
-    sendResponse(res, 200, "User updated successfully");
+    sendResponse(res, 200, "User updated successfully",updatedData);
   } catch (error) {
     next(error);
   }

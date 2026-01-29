@@ -133,39 +133,64 @@ export const updateUser = async (id, data) => {
     await connection.beginTransaction();
     const { name, email, role } = data;
 
-     // email check
+    const [[user]] = await connection.execute(
+      "SELECT role FROM users WHERE id = ?",
+      [id],
+    );
+
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    if (user.role !== role) {
+      throw new ApiError(400, "Role is not valid");
+    }
+
+    // email check
     const [existing] = await connection.execute(
       "SELECT id FROM users WHERE email = ? AND id != ?",
-      [email,id],
+      [email, id],
     );
 
     if (existing.length > 0) {
       throw new ApiError(409, "User with this email already exists");
     }
 
-    const [result] = await connection.execute(
+    await connection.execute(
       `UPDATE users 
      SET name = ?, email = ?
      WHERE id = ?`,
       [name, email, id],
     );
 
+    let updateUser;
+
     // doctor table update
     if (role === ROLES.DOCTOR) {
       const { specialization, department_id } = data;
       await connection.execute(
-        "UPDATE doctors SET sepcialization = ?, department_id = ? where user_id = ?",
-        [specialization, department_id,id],
+        "UPDATE doctors SET specialization = ?, department_id = ? where user_id = ?",
+        [specialization, department_id, id],
+      );
+
+      [[updateUser]] = await connection.execute(
+        "SELECT u.id, u.name, u.email, u.role, d.sepcialization, d.department_id, d.hospital_id FROM users u LEFT JOIN docors d ON u.id = d.user_id WHERE u.id = ?",
+        [id],
+      );
+    } else {
+      [[updateUser]] = await connection.execute(
+        "SELECT id, name, email, role FROM users WHERE id = ?",
+        [id],
       );
     }
 
-    (await connection).commit();
+    await connection.commit();
 
-    return result.affectedRows;
+    return updateUser;
   } catch (error) {
-    (await connection).rollback();
+    await connection.rollback();
     throw error;
   } finally {
-    (await connection).release()
+    connection.release();
   }
 };
