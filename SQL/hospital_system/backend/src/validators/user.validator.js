@@ -40,6 +40,9 @@ export const getUserQuerySchema = Joi.object({
 export const updateUsersSchema = Joi.object({
   name: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
+  role: Joi.string()
+    .valid(ROLES.ADMIN, ROLES.DOCTOR, ROLES.STAFF)
+    .required(),
 
   // Doctor-specific fields
   department_id: Joi.number().when("role", {

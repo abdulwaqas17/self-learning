@@ -127,7 +127,7 @@ export const getUserById = async (id) => {
 
 // update user service
 export const updateUser = async (id, data) => {
-  const connection = db.getConnection();
+  const connection = await db.getConnection();
 
   try {
     await connection.beginTransaction();
@@ -135,8 +135,8 @@ export const updateUser = async (id, data) => {
 
      // email check
     const [existing] = await connection.execute(
-      "SELECT id FROM users WHERE email = ?",
-      [email],
+      "SELECT id FROM users WHERE email = ? AND id != ?",
+      [email,id],
     );
 
     if (existing.length > 0) {
