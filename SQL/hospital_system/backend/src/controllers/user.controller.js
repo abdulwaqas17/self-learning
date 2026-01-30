@@ -14,13 +14,14 @@ export const createUser = async (req, res, next) => {
 // get all users function
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { page, limit, search, role } = req.query;
+    const { page, limit, search, role,is_deleted } = req.query;
 
     const result = await userService.getAllUsers({
       page,
       limit,
       search,
       role,
+      is_deleted
     });
 
     sendResponse(res, 200, `${role}s fetched successfully`, result);

@@ -77,72 +77,72 @@ export const createUser = async (data) => {
 };
 
 // get all users service
-export const getAllUsers = async ({ page, limit, search, role }) => {
+export const getAllUsers = async ({ page, limit, search, role,is_deleted=0 }) => {
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const offset = (page - 1) * limit;
 
-  let whereClause = "WHERE role = ?";
-  let values = [role];
+  console.log('==============is_deleted======================');
+  console.log(is_deleted);
+  console.log('==============is_deleted======================');
 
-  const searchableFields = ["name", "email"];
+  let values = [role,is_deleted];
+  let whereClause = `WHERE u.role = ? AND u.is_deleted = ?`;
+
+  let joinClause = "";
+  let searchConditions = [];
 
   if (role === ROLES.DOCTOR) {
-    searchableFields.push("specialization");
+    joinClause = `LEFT JOIN doctors d ON u.id = d.user_id`;
   }
 
   if (search) {
-    const conditions = searchableFields
-      .map((field) => `${field} LIKE ?`)
-      .join(" OR ");
+    searchConditions.push(`u.name LIKE ?`, `u.email LIKE ?`);
+    values.push(`%${search}%`, `%${search}%`);
 
-    whereClause += ` AND (${conditions})`;
-    searchableFields.forEach(() => values.push(`%${search}%`));
+    if (role === ROLES.DOCTOR) {
+      searchConditions.push(`d.specialization LIKE ?`);
+      values.push(`%${search}%`);
+    }
+
+    whereClause += ` AND (${searchConditions.join(" OR ")})`;
   }
 
-  // count query
-  const [countResult] = await db.execute(
-    `SELECT COUNT(*) as total FROM users ${whereClause}`,
-    values,
+  // COUNT
+  const [[{ total }]] = await db.execute(
+    `SELECT COUNT(*) as total
+     FROM users u
+     ${joinClause}
+     ${whereClause}`,
+    values
   );
 
-  const totalRecords = countResult[0].total;
-  const totalPages = Math.ceil(totalRecords / limit);
+  // DATA
+  const [rows] = await db.execute(
+    `SELECT
+     u.id, u.name, u.email, u.role, u.is_deleted
+  ${role === ROLES.DOCTOR 
+    ? ", d.specialization, d.department_id, d.hospital_id" 
+    : ""}
+     FROM users u
+     ${joinClause}
+     ${whereClause}
+     ORDER BY u.id DESC
+     LIMIT ${limit} OFFSET ${offset}`,
+    [...values]
+  );
 
-  let rows;
-
-  if (role === ROLES.DOCTOR) {
-     [rows] = await db.execute(
-      `SELECT u.id, u.name, u.email, u.role, u.is_deleted, u.deleted_at d.specialization, d.department_id, d.hospital_id FROM users u
-       LEFT JOIN doctors d ON u.id = d.user_id
-       ${whereClause}
-       ORDER BY u.id DESC
-       LIMIT ${limit} OFFSET ${offset}`,
-      [...values],
-    );
-  } else {
-
-    
-    // data query
-    [rows] = await db.execute(
-      `SELECT id,name,email,role,is_deleted,deleted_at FROM users
-      ${whereClause}
-      ORDER BY id DESC
-      LIMIT ${limit} OFFSET ${offset}`,
-      [...values],
-    );
-    
-  }
   return {
     data: rows,
     pagination: {
-      totalRecords,
-      totalPages,
+      totalRecords: total,
+      totalPages: Math.ceil(total / limit),
       currentPage: page,
       limit,
     },
   };
 };
+
 
 // get user by id service
 export const getUserById = async (id) => {
