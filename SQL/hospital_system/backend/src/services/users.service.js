@@ -55,7 +55,6 @@ export const createUser = async (data) => {
         [userId, department_id, hospital_id, specialization],
       );
 
-      
       [[newUser]] = await connection.execute(
         "SELECT u.id, u.name, u.email, u.role, d.specialization, d.department_id, d.hospital_id FROM users u INNER JOIN docors d ON u.id = d.user_id WHERE u.id = ?",
         [userId],
@@ -79,60 +78,77 @@ export const createUser = async (data) => {
 
 // get all users service
 export const getAllUsers = async ({ page, limit, search, role }) => {
+  page = Number(page) || 1;
+  limit = Number(limit) || 10;
+  const offset = (page - 1) * limit;
 
-    page = Number(page) || 1;
-    limit = Number(limit) || 10;
-    const offset = (page - 1) * limit;
+  let whereClause = "WHERE role = ?";
+  let values = [role];
 
-    let whereClause = "WHERE role = ?";
-    let values = [role];
+  const searchableFields = ["name", "email"];
 
-    const searchableFields = ["name", "email"];
+  if (role === ROLES.DOCTOR) {
+    searchableFields.push("specialization");
+  }
 
-    if (search) {
-      const conditions = searchableFields
-        .map((field) => `${field} LIKE ?`)
-        .join(" OR ");
+  if (search) {
+    const conditions = searchableFields
+      .map((field) => `${field} LIKE ?`)
+      .join(" OR ");
 
-      whereClause += ` AND (${conditions})`;
-      searchableFields.forEach(() => values.push(`%${search}%`));
-    }
+    whereClause += ` AND (${conditions})`;
+    searchableFields.forEach(() => values.push(`%${search}%`));
+  }
 
-    // count query
-    const [countResult] = await db.execute(
-      `SELECT COUNT(*) as total FROM users ${whereClause}`,
-      values,
-    );
+  // count query
+  const [countResult] = await db.execute(
+    `SELECT COUNT(*) as total FROM users ${whereClause}`,
+    values,
+  );
 
-    const totalRecords = countResult[0].total;
-    const totalPages = Math.ceil(totalRecords / limit);
+  const totalRecords = countResult[0].total;
+  const totalPages = Math.ceil(totalRecords / limit);
 
-    // data query
-    const [rows] = await db.execute(
-      `SELECT * FROM users
+  let rows;
+
+  if (role === ROLES.DOCTOR) {
+     [rows] = await db.execute(
+      `SELECT u.id, u.name, u.email, u.role, u.is_deleted, u.deleted_at d.specialization, d.department_id, d.hospital_id FROM users u
+       LEFT JOIN doctors d ON u.id = d.user_id
        ${whereClause}
-       ORDER BY id DESC
+       ORDER BY u.id DESC
        LIMIT ${limit} OFFSET ${offset}`,
       [...values],
     );
+  } else {
 
-    return {
-      data: rows,
-      pagination: {
-        totalRecords,
-        totalPages,
-        currentPage: page,
-        limit,
-      },
-    };
-
+    
+    // data query
+    [rows] = await db.execute(
+      `SELECT id,name,email,role,is_deleted,deleted_at FROM users
+      ${whereClause}
+      ORDER BY id DESC
+      LIMIT ${limit} OFFSET ${offset}`,
+      [...values],
+    );
+    
+  }
+  return {
+    data: rows,
+    pagination: {
+      totalRecords,
+      totalPages,
+      currentPage: page,
+      limit,
+    },
+  };
 };
 
 // get user by id service
 export const getUserById = async (id) => {
   let [[user]] = await db.execute(
     "SELECT id, name, email, role FROM users WHERE id = ?",
-    [id]
+    [id],
   );
 
   if (!user) {
@@ -142,7 +158,7 @@ export const getUserById = async (id) => {
   if (user.role === ROLES.DOCTOR) {
     const [[doctor]] = await db.execute(
       "SELECT specialization, department_id, hospital_id FROM doctors WHERE user_id = ?",
-      [id]
+      [id],
     );
 
     if (doctor) {
@@ -152,7 +168,6 @@ export const getUserById = async (id) => {
 
   return user;
 };
-
 
 // update user service
 export const updateUser = async (id, data) => {
@@ -222,4 +237,28 @@ export const updateUser = async (id, data) => {
   } finally {
     connection.release();
   }
+};
+
+// delete user service
+export const deleteUser = async (id) => {
+  const [[user]] = await db.execute(
+    "SELECT id, role FROM users WHERE id = ? AND is_deleted = false",
+    [id],
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  } else if (user.role === ROLES.ADMIN) {
+    throw new ApiError(400, "Cannot delete admin user");
+  }
+
+  // soft delete user
+  await db.execute(
+    `UPDATE users 
+       SET is_deleted = true, deleted_at = NOW() 
+       WHERE id = ?`,
+    [id],
+  );
+
+  return true;
 };

@@ -1,13 +1,11 @@
-import * as userService from "../services/users.service.js"
-import { ApiError } from "../utils/ApiError.js";
+import * as userService from "../services/users.service.js";
 import { sendResponse } from "../utils/ApiResponse.js";
-
 
 // create user function
 export const createUser = async (req, res, next) => {
   try {
     const user = await userService.createUser(req.body);
-    sendResponse(res, 201, `${req.body.role} created successfully`,user );
+    sendResponse(res, 201, `${req.body.role} created successfully`, user);
   } catch (error) {
     next(error);
   }
@@ -16,13 +14,13 @@ export const createUser = async (req, res, next) => {
 // get all users function
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { page, limit, search,role } = req.query;
+    const { page, limit, search, role } = req.query;
 
     const result = await userService.getAllUsers({
       page,
       limit,
       search,
-      role
+      role,
     });
 
     sendResponse(res, 200, `${role}s fetched successfully`, result);
@@ -30,7 +28,6 @@ export const getAllUsers = async (req, res, next) => {
     next(error);
   }
 };
-
 
 // get user by id function
 export const getUserById = async (req, res, next) => {
@@ -44,7 +41,6 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
-
 // update user function
 export const updateUser = async (req, res, next) => {
   try {
@@ -52,7 +48,19 @@ export const updateUser = async (req, res, next) => {
 
     const updatedData = await userService.updateUser(id, req.body);
 
-    sendResponse(res, 200, "User updated successfully",updatedData);
+    sendResponse(res, 200, "User updated successfully", updatedData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// delete user function
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await userService.deleteUser(id);
+
+    sendResponse(res, 200, "User deleted successfully");
   } catch (error) {
     next(error);
   }

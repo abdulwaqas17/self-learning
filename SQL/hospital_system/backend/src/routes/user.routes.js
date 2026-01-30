@@ -4,7 +4,7 @@ import { allowRoles } from "../middlewares/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { createUsersSchema, getUserQuerySchema, updateUsersSchema } from "../validators/user.validator.js";
-import { createUser, getAllUsers, getUserById, updateUser } from "../controllers/user.controller.js";
+import { createUser, deleteUser, getAllUsers, getUserById, updateUser } from "../controllers/user.controller.js";
 import { idParamSchema } from "../validators/global.validator.js";
 
 
@@ -42,6 +42,14 @@ router.put(
   validate(idParamSchema, "params"),
   validate(updateUsersSchema),
   updateUser,
+);
+
+router.delete(
+  "/delete/:id",
+  authMiddleware,
+  allowRoles(ROLES.ADMIN),
+  validate(idParamSchema, "params"),
+  deleteUser,
 );
 
 
