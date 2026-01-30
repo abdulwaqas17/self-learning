@@ -10,6 +10,38 @@ import { idParamSchema } from "../validators/global.validator.js";
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /create:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Usersss]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password, role]
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, DOCTOR, STAFF]
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       409:
+ *         description: Email already exists
+ */
+
 router.post(
   "/create",
   authMiddleware,
