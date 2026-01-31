@@ -4,8 +4,8 @@ import patientRoutes from "./routes/patient.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import usersRoutes from "./routes/user.routes.js";
 import { globalErrorHandler } from "./middlewares/error.middleware.js";
-import { ApiError } from "./utils/ApiError.js";
-import { swaggerSpec } from "../swagger.js";
+import { ApiError } from "./utils/ApiError.js"; 
+import { swaggerSpec } from "../src/docs/swagger.js";
 import swaggerUi from "swagger-ui-express";
 
 const app = express();

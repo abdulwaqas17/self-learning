@@ -12,34 +12,41 @@ const router = express.Router();
 
 /**
  * @openapi
- * /create:
+ * /users/create:
  *   post:
- *     summary: Create a new user
- *     tags: [Usersss]
+ *     summary: Create a new user (Admin only)
+ *     description: |
+ *       Only **ADMIN** users can create new users.
+ *       If role is **DOCTOR**, doctor-specific fields are required.
+ *     tags: [Users]
  *     security:
  *       - bearerAuth: []
+ *
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [name, email, password, role]
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               role:
- *                 type: string
- *                 enum: [ADMIN, DOCTOR, STAFF]
+ *             oneOf:
+ *               - $ref: '#/components/schemas/CreateAdminOrStaffUser'
+ *               - $ref: '#/components/schemas/CreateDoctorUser'
+ *
  *     responses:
  *       201:
  *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - $ref: '#/components/schemas/UserResponse'
+ *                 - $ref: '#/components/schemas/DoctorUserResponse'
+ *
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (Only admin allowed)
  *       409:
- *         description: Email already exists
+ *         description: Email already exists or admin already exists
  */
 
 router.post(

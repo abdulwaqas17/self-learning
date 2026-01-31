@@ -1,5 +1,8 @@
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import { swaggerTags } from "./tags.js";
+import { userSchemas } from "./schemas/user.schema.js";
+import { authSchemas } from "./schemas/auth.schema.js";
 
 const options = {
   definition: {
@@ -8,9 +11,10 @@ const options = {
       title: "Hospital Management API",
       version: "1.0.0",
     },
+    tags : swaggerTags,
     servers: [
   {
-    url: "http://localhost:3000",
+    url: "http://localhost:5000/api",
     description: "Local",
   },
   {
@@ -26,6 +30,9 @@ const options = {
           bearerFormat: "JWT",
         },
       },
+      schemas: {
+        ...userSchemas,...authSchemas
+      }
     },
     security: [{ bearerAuth: [] }],
   },
