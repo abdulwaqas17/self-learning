@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 
+// Middleware to authenticate requests using JWT
 export const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
 
