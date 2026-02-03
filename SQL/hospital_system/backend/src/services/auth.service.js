@@ -1,6 +1,7 @@
 import db from "../config/db.js";
 import bcrypt from "bcrypt";
 
+// Service to handle user login
 export const loginUserService = async (email, password) => {
   const [rows] = await db.execute(
     "SELECT * FROM users WHERE email = ?",
