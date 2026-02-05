@@ -5,3 +5,10 @@ SHOW DATABASES;
 USE hospital_system;
 
 DESCRIBE users;
+
+AWS_REGION=ap-south-1
+S3_BUCKET_NAME=users-profile-bucket-demo
+REDIS_URL=redis://localhost:6379
+PORT=5000
+User name,Password,Console sign-in URL
+abdul-waqas,W@qa$00001,https://414482992523.signin.aws.amazon.com/console
