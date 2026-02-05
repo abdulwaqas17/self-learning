@@ -12,3 +12,18 @@ REDIS_URL=redis://localhost:6379
 PORT=5000
 User name,Password,Console sign-in URL
 abdul-waqas,W@qa$00001,https://414482992523.signin.aws.amazon.com/console
+
+PORT=5000
+
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=W@qa$
+DB_NAME=backend_intern_first_task
+
+JWT_SECRET=supersecretkey
+NODE_ENV=development
+
+GOOGLE_CLIENT_ID=511499252119-gf8kr5ejjkns2eaqamqjmototi4meqhh.apps.googleusercontent.com
+
+gpt link https://chatgpt.com/share/6984e531-0e0c-800b-ac3d-8c95fdcb39b7
