@@ -1,73 +1,48 @@
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
-import  db  from '../config/db.js';
+import prisma from '../config/prisma.js';
+import { ROLES } from '../constants/roles.js';
+import { generateAccessToken } from '../utils/jwt.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-/* ---------------- GOOGLE LOGIN ---------------- */
-export const googleLogin = async (idToken) => {
-  // 1. Verify Google token
+export const googleLogin = async (idToken) => { 
+
+
   const ticket = await googleClient.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID
   });
 
-  console.log('===================ticket=================');
+
+
+  const { email } = ticket.getPayload();
+
+  let user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  console.log('=================authService===================');
+  console.log(idToken);
   console.log(ticket);
-  console.log('===================ticket=================');
+  console.log(user);
+  console.log('=================authService===================');
 
-  const payload = ticket.getPayload();
-
-  console.log('===================payload=================');
-  console.log(payload);
-  console.log('===================payload=================');
-
-  const email = payload.email;
-  const full_name = payload.name;
-
-  // 2. Check user in DB
-  const [rows] = await db.execute(
-    'SELECT * FROM users WHERE email = ?',
-    [email]
-  );
-
-  console.log('=================rows===================');
-  console.log(rows);
-  console.log('=================rows===================');
-
-  let user = rows[0];
-
-  // 3. If not exists → signup
   if (!user) {
-    const [result] = await db.execute(
-      `INSERT INTO users 
-       (full_name, email, profile_completed, role, token_version)
-       VALUES (?, ?, false, 'MEMBER', 1)`,
-      [full_name, email]
-    );
-
-    user = {
-      id: result.insertId,
-      full_name,
-      email,
-      role: 'MEMBER',
-      token_version: 1
-    };
+    user = await prisma.user.create({
+      data: {
+        
+        email,
+        role: ROLES.MEMBER
+      }
+    });
   }
 
-  // 4. Generate JWT
-  const token = jwt.sign(
-    {
-      userId: user.id,
-      role: user.role,
-      tokenVersion: user.token_version
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-  );
+  const token = generateAccessToken(user);
 
   return { user, token };
 };
+
 
 
 // export const emailSignup = async ({ full_name, email, password }) => {
