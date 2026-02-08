@@ -126,12 +126,12 @@ export default function Login() {
 
       const data = await presignRes.json();
 
-      console.log('=============upload url=======================');
+      console.log('=============upload url==============');
       console.log(data);
       console.log(data.data);
       console.log(file);
       
-      console.log('=============upload url=======================');
+      console.log('=============upload url==============');
 
       // 2️⃣ PUT request → DIRECT S3
       await fetch(data.data.uploadUrl, {

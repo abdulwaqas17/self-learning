@@ -20,9 +20,9 @@ export const getPresignedUploadUrl = async (req, res, next) => {
     });
   } catch (error) {
 
-    console.log('=============pre sign service error=======================');
+    console.log('=============pre sign service error=============');
     console.log(error);
-    console.log('=============pre sign service error=======================');
+    console.log('=============pre sign service error=========');
     next(error);
   }
 };
