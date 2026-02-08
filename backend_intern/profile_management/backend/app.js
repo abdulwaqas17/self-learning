@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import authRoutes from './src/routes/AuthRoutes.js';
+import uploadRoutes from './src/routes/UploadRoutes.js';
 
 const app = express();
 app.use(express.json());
@@ -9,7 +10,8 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 // Error handling
 // app.use((err, req, res, next) => {
