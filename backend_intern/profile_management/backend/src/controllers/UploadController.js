@@ -1,21 +1,24 @@
-import { generatePresignedUrl } from "../services/upload.service.js";
+import { generatePresignedUrl } from "../services/UploadService.js";
 
 export const getPresignedUploadUrl = async (req, res, next) => {
   try {
-    const { fileType, uploadFor } = req.body;
-    const userId = req.user.id; // JWT se aa raha
+    const { fileType, fileName, uploadFor } = req.body;
 
     const data = await generatePresignedUrl({
-      userId,
       fileType,
-      uploadFor
+      fileName,
+      uploadFor,
     });
 
     res.status(200).json({
       success: true,
-      data
+      data,
     });
   } catch (error) {
+
+    console.log('=============pre sign service error=======================');
+    console.log(error);
+    console.log('=============pre sign service error=======================');
     next(error);
   }
 };

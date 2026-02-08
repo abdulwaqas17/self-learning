@@ -1,32 +1,32 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3 } from "../utils/S3";
+import { s3 } from "../config/Aws.js";
 
 export const generatePresignedUrl = async ({
-  userId,
   fileType,
-  uploadFor
+  fileName,
+  uploadFor,
 }) => {
-  let folder = "misc";
 
-  if (uploadFor === "profile_pic") folder = "profile-pics";
-  if (uploadFor === "company_logo") folder = "company-logos";
+ if (!["profile_pic", "company_logo"].includes(uploadFor)) {
+    throw new Error("Invalid uploadFor value");
+  }
 
-  const key = `${folder}/${userId}/${Date.now()}`;
+  const key = `${uploadFor}/${Date.now()}/${fileName}`;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.S3_BUCKET,
+    Bucket: process.env.S3_BUCKET_NAME,
     Key: key,
-    ContentType: fileType
+    ContentType: fileType,
   });
 
   const uploadUrl = await getSignedUrl(s3, command, {
-    expiresIn: 60
+    expiresIn: 60,
   });
 
   return {
     uploadUrl,
     key,
-    cdnUrl: `${process.env.CDN_URL}/${key}`
+    cdnUrl: `${process.env.CDN_URL}/${key}`,
   };
 };

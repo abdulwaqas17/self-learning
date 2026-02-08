@@ -110,24 +110,31 @@ export default function Login() {
     try {
       // 1️⃣ Presigned URL backend se lo
       const presignRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload/presigned-url`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/presigned-url`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("jwt")}`
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
             fileName: file.name,
-            fileType: file.type
+            fileType: file.type,
+            uploadFor: "profile_pic"
           })
         }
       );
 
-      const { uploadUrl, fileKey, cdnUrl } = await presignRes.json();
+      const data = await presignRes.json();
+
+      console.log('=============upload url=======================');
+      console.log(data);
+      console.log(data.data);
+      console.log(file);
+      
+      console.log('=============upload url=======================');
 
       // 2️⃣ PUT request → DIRECT S3
-      await fetch(uploadUrl, {
+      await fetch(data.data.uploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": file.type
@@ -136,8 +143,7 @@ export default function Login() {
       });
 
       console.log("✅ Image uploaded to S3");
-      console.log("Key:", fileKey);
-      console.log("CDN URL:", cdnUrl);
+
 
       // (STEP-3 baad mein: backend ko key/url save karwao)
 

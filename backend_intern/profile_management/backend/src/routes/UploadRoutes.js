@@ -1,9 +1,8 @@
 import express from "express";
-import { getPresignedUploadUrl } from "../controllers/upload.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
+import { getPresignedUploadUrl } from "../controllers/UploadController.js";
 
 const router = express.Router();
 
-router.post("/presigned-url", protect, getPresignedUploadUrl);
+router.post("/presigned-url", getPresignedUploadUrl);
 
 export default router;
