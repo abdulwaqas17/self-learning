@@ -4,6 +4,10 @@ export const getPresignedUploadUrl = async (req, res, next) => {
   try {
     const { fileType, fileName, uploadFor } = req.body;
 
+    console.log('==================filetype==================');
+    console.log(fileType);
+    console.log('==================filetype==================');
+
     const data = await generatePresignedUrl({
       fileType,
       fileName,
