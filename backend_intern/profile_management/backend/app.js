@@ -12,6 +12,8 @@ app.use(cors());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/uploads", express.static("uploads"));
+
 
 // Error handling
 // app.use((err, req, res, next) => {

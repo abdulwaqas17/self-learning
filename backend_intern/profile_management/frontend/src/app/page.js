@@ -106,22 +106,21 @@ export default function Login() {
 
     try {
       // 1️⃣ Presigned URL backend se lo
-      const presignRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/presigned-url`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            fileName: file.name,
-            fileType: file.type,
-            uploadFor: "profile_pic"
-          })
-        }
-      );
+    const formData = new FormData();
+    formData.append("image", file); // 👈 IMPORTANT
+    formData.append("fileType", file.type);
+    formData.append("fileName", file.name);
+    formData.append("uploadFor", "profile_pic");
 
-      const data = await presignRes.json();
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/upload/image`,
+      {
+        method: "POST",
+        body: formData, // ❌ headers mat do
+      }
+    );
+
+      const data = await res.json();
 
       console.log('=============upload url==============');
       console.log(data);
@@ -131,13 +130,15 @@ export default function Login() {
       console.log('=============upload url==============');
 
       // 2️⃣ PUT request → DIRECT S3
-      await fetch(data.data.uploadUrl, {
+  if(data.data.uploadUrl){
+        await fetch(data.data.uploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": file.type
         },
         body: file
       });
+  }
 
       console.log("✅ Image uploaded to S3");
 
