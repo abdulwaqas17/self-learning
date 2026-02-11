@@ -27,7 +27,7 @@ const Courses = () => {
                 component="img"
                 height="200"
               />
-
+{/* cart content of mui */}
               <CardContent>
                 <Typography variant="h6" color="initial">
                   {course.title}
