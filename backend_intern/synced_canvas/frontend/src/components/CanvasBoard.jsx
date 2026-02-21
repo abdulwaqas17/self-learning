@@ -3,6 +3,8 @@ import { useCanvasStore } from "../store/canvasStore";
 
 export default function CanvasBoard() {
   const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  const lastPointRef = useRef(null);
 
   const strokes = useCanvasStore((state) => state.strokes);
   const startStroke = useCanvasStore((state) => state.startStroke);
@@ -21,6 +23,12 @@ export default function CanvasBoard() {
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
+      return () => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+  }
   }, []);
 
   useEffect(() => {
@@ -28,6 +36,7 @@ export default function CanvasBoard() {
   }, [strokes]);
 
   const startDrawing = (e) => {
+    console.log("e", e);
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
 
@@ -39,22 +48,53 @@ export default function CanvasBoard() {
     ctx.moveTo(x, y);
   };
 
+
   const draw = (e) => {
-    if (!isDrawing) return;
+  if (!isDrawing) return;
 
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
+  const x = e.nativeEvent.offsetX;
+  const y = e.nativeEvent.offsetY;
 
+  // Save latest mouse position
+  lastPointRef.current = { x, y };
+
+  // Agar already scheduled hai to kuch mat karo
+  console.log("animationFrameRef.current", animationFrameRef.current);
+  if (animationFrameRef.current) return;
+
+  animationFrameRef.current = requestAnimationFrame(() => {
+    const point = lastPointRef.current;
     const ctx = canvasRef.current.getContext("2d");
 
     ctx.strokeStyle = color;
     ctx.lineWidth = brushSize;
 
-    ctx.lineTo(x, y);
+    ctx.lineTo(point.x, point.y);
     ctx.stroke();
 
-    addPoint({ x, y });
-  };
+    addPoint(point);
+
+    animationFrameRef.current = null;
+  });
+};
+  // const draw = (e) => {
+  //   if (!isDrawing) return;
+
+  //   const x = e.nativeEvent.offsetX;
+  //   const y = e.nativeEvent.offsetY;
+
+  //   const ctx = canvasRef.current.getContext("2d");
+
+  //   ctx.strokeStyle = color;
+  //   ctx.lineWidth = brushSize;
+
+  //   ctx.lineTo(x, y);
+  //   ctx.stroke();
+
+  //   console.log("Draw x,y", x, y);
+
+  //   addPoint({ x, y });
+  // };
 
   const stopDrawing = () => {
     setIsDrawing(false);
@@ -89,7 +129,11 @@ export default function CanvasBoard() {
       <h2>Zustand Synced Canvas</h2>
 
       <div style={{ marginBottom: "10px" }}>
-        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
         <input
           type="range"
           min="1"
@@ -115,18 +159,9 @@ export default function CanvasBoard() {
   );
 }
 
-
-
-
-
-
-
-
-
-
 //  ###########################################################################
 
-// Use State and Local Storage for Stroke Management 
+// Use State and Local Storage for Stroke Management
 
 // ############################################################################
 
@@ -160,7 +195,6 @@ export default function CanvasBoard() {
 //   redrawCanvas();
 //   console.log("Strokes Updated:", strokes);
 // }, [strokes]);
-
 
 //   // Drawing Start function initializes the stroke and captures the starting point
 //   const startDrawing = (e) => {
@@ -252,7 +286,6 @@ export default function CanvasBoard() {
 //     });
 //   };
 
-
 //   return (
 //     <div style={{ padding: "20px" }}>
 //       <h2>Synced Canvas - Local Version</h2>
@@ -271,7 +304,7 @@ export default function CanvasBoard() {
 //           value={brushSize}
 //           onChange={(e) => setBrushSize(e.target.value)}
 //         />
-//         <button onClick={undoLastStroke}>Undo</button>  
+//         <button onClick={undoLastStroke}>Undo</button>
 //         <button onClick={clearBoard}>Clear</button>
 //       </div>
 

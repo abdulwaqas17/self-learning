@@ -1,0 +1,136 @@
+Client (browser) aur Server (Node.js) ke beech event-driven data transfer allow karta hai.
+
+Difference from normal HTTP requests:
+
+HTTP = Request-Response
+
+Socket.io = Persistent connection, server push possible
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===========================================================================
+
+===========================================================================
+
+
+
+
+
+
+
+🔹 2️⃣ getContext("2d") Kya Hai?
+📌 Definition (Interview Ready)
+
+getContext("2d") returns a 2D rendering context object that provides methods and properties for drawing shapes, text, images, and paths on the canvas.
+
+📌 Simple Samjho
+
+Canvas = kagaz
+Context (ctx) = pen
+
+Agar pen nahi hoga to kagaz pe draw nahi kar sakte.
+
+🔹 3️⃣ Is se kya milta hai?
+
+ctx object milta hai jisme bohat saare drawing methods hote hain:
+
+Method	Kaam
+beginPath()	naya stroke start
+moveTo()	starting point
+lineTo()	line banana
+stroke()	draw karna
+fillRect()	rectangle fill
+clearRect()	erase
+arc()	circle banana
+
+
+
+
+
+===========================================================================
+
+===========================================================================
+
+
+
+
+
+Socket.io Kya Hai?
+
+Ye real-time bidirectional communication library hai.
+
+Client (browser) aur Server (Node.js) ke beech event-driven data transfer allow karta hai.
+
+Difference from normal HTTP requests:
+
+HTTP = Request-Response
+
+Socket.io = Persistent connection, server push possible
+
+
+
+
+
+
+
+===========================================================================
+
+===========================================================================
+
+
+
+
+
+
+
+
+Room Kya Hota Hai?
+
+Socket.io me:
+
+Room = logical group of connected users (sockets)
+
+Ye koi physical folder nahi hota.
+Ye server ke memory me ek grouping hoti hai.
+
+Matlab:
+
+Multiple users ek same room me ho sakte hain
+
+Server un sab ko ek group ki tarah treat karta hai
+
+🎯 Tumhare Project Me Room Ka Matlab
+
+Doc ke hisaab se:
+
+Each shared canvas = ek room
+
+Example:
+
+Room ID	Meaning
+team-1	Marketing team whiteboard
+team-2	Dev team whiteboard
+room-xyz	Brainstorm session
+
+Agar 50 log app me hain:
+
+10 log team-1 me
+
+20 log team-2 me
+
+20 log kisi aur room me
+
+Drawing sirf usi room me visible hogi.
