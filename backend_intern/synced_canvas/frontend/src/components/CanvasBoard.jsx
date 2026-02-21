@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import { useCanvasStore } from "../store/canvasStore";
+import { socket } from "../socket/socket";
 
 export default function CanvasBoard() {
   const canvasRef = useRef(null);
@@ -17,6 +18,58 @@ export default function CanvasBoard() {
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
 
+  const roomId = "team1";
+
+  // ===============================
+  // 🔥 SOCKET SETUP
+  // ===============================
+  useEffect(() => {
+    socket.emit("joinRoom", roomId);
+
+    socket.on("strokeStart", ({ x, y }) => {
+      startStroke({ x, y });
+
+      const ctx = canvasRef.current.getContext("2d");
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    });
+
+    socket.on("strokePoint", ({ x, y, color, brushSize }) => {
+      const ctx = canvasRef.current.getContext("2d");
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = brushSize;
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      addPoint({ x, y });
+    });
+
+    socket.on("strokeEnd", ({ color, brushSize }) => {
+      endStroke(color, brushSize);
+    });
+
+    socket.on("undo", () => {
+      undo();
+    });
+
+    socket.on("clear", () => {
+      clear();
+    });
+
+    return () => {
+      socket.off("strokeStart");
+      socket.off("strokePoint");
+      socket.off("strokeEnd");
+      socket.off("undo");
+      socket.off("clear");
+    };
+  }, []);
+
+  // ===============================
+  // CANVAS INIT
+  // ===============================
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -24,19 +77,21 @@ export default function CanvasBoard() {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-      return () => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-  }
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
     redrawCanvas();
   }, [strokes]);
 
+  // ===============================
+  // START DRAW
+  // ===============================
   const startDrawing = (e) => {
-    console.log("e", e);
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
 
@@ -46,61 +101,65 @@ export default function CanvasBoard() {
     const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(x, y);
+
+    socket.emit("strokeStart", { roomId, x, y });
   };
 
-
+  // ===============================
+  // DRAW (RAF THROTTLED)
+  // ===============================
   const draw = (e) => {
-  if (!isDrawing) return;
+    if (!isDrawing) return;
 
-  const x = e.nativeEvent.offsetX;
-  const y = e.nativeEvent.offsetY;
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
 
-  // Save latest mouse position
-  lastPointRef.current = { x, y };
+    lastPointRef.current = { x, y };
 
-  // Agar already scheduled hai to kuch mat karo
-  console.log("animationFrameRef.current", animationFrameRef.current);
-  if (animationFrameRef.current) return;
+    if (animationFrameRef.current) return;
 
-  animationFrameRef.current = requestAnimationFrame(() => {
-    const point = lastPointRef.current;
-    const ctx = canvasRef.current.getContext("2d");
+    animationFrameRef.current = requestAnimationFrame(() => {
+      const point = lastPointRef.current;
+      const ctx = canvasRef.current.getContext("2d");
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = brushSize;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = brushSize;
 
-    ctx.lineTo(point.x, point.y);
-    ctx.stroke();
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
 
-    addPoint(point);
+      addPoint(point);
 
-    animationFrameRef.current = null;
-  });
-};
-  // const draw = (e) => {
-  //   if (!isDrawing) return;
+      // 🔥 Emit to other users
+      socket.emit("strokePoint", {
+        roomId,
+        x: point.x,
+        y: point.y,
+        color,
+        brushSize,
+      });
 
-  //   const x = e.nativeEvent.offsetX;
-  //   const y = e.nativeEvent.offsetY;
+      animationFrameRef.current = null;
+    });
+  };
 
-  //   const ctx = canvasRef.current.getContext("2d");
-
-  //   ctx.strokeStyle = color;
-  //   ctx.lineWidth = brushSize;
-
-  //   ctx.lineTo(x, y);
-  //   ctx.stroke();
-
-  //   console.log("Draw x,y", x, y);
-
-  //   addPoint({ x, y });
-  // };
-
+  // ===============================
+  // STOP DRAW
+  // ===============================
   const stopDrawing = () => {
     setIsDrawing(false);
     endStroke(color, brushSize);
+
+    socket.emit("strokeEnd", {
+      roomId,
+      color,
+      brushSize,
+    });
   };
 
+  // ===============================
+  // REDRAW FUNCTION (UNCHANGED)
+  // ===============================
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -141,8 +200,23 @@ export default function CanvasBoard() {
           value={brushSize}
           onChange={(e) => setBrushSize(e.target.value)}
         />
-        <button onClick={undo}>Undo</button>
-        <button onClick={clear}>Clear</button>
+        <button
+          onClick={() => {
+            undo();
+            socket.emit("undo", { roomId });
+          }}
+        >
+          Undo
+        </button>
+
+        <button
+          onClick={() => {
+            clear();
+            socket.emit("clear", { roomId });
+          }}
+        >
+          Clear
+        </button>
       </div>
 
       <canvas
