@@ -1,17 +1,20 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useCanvasStore } from "../store/canvasStore";
 
 export default function CanvasBoard() {
   const canvasRef = useRef(null);
+
+  const strokes = useCanvasStore((state) => state.strokes);
+  const startStroke = useCanvasStore((state) => state.startStroke);
+  const addPoint = useCanvasStore((state) => state.addPoint);
+  const endStroke = useCanvasStore((state) => state.endStroke);
+  const undo = useCanvasStore((state) => state.undo);
+  const clear = useCanvasStore((state) => state.clear);
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(5);
 
-  // Stroke capture (project document ke hisaab se)
-  const [currentStroke, setCurrentStroke] = useState([]);
-  const [strokes, setStrokes] = useState([]);
-
-  // Initialize canvas context on mount
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -20,37 +23,29 @@ export default function CanvasBoard() {
     ctx.lineJoin = "round";
   }, []);
 
- // Redraw canvas whenever strokes change (useful for syncing and clearing)
   useEffect(() => {
-  redrawCanvas();
-  console.log("Strokes Updated:", strokes);
-}, [strokes]);
+    redrawCanvas();
+  }, [strokes]);
 
-
-  // Drawing Start function initializes the stroke and captures the starting point
   const startDrawing = (e) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
 
     setIsDrawing(true);
-    setCurrentStroke([{ x, y }]);
+    startStroke({ x, y });
 
+    const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(x, y);
   };
 
-  // Draw function captures points and updates the stroke in real-time
   const draw = (e) => {
     if (!isDrawing) return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
+
+    const ctx = canvasRef.current.getContext("2d");
 
     ctx.strokeStyle = color;
     ctx.lineWidth = brushSize;
@@ -58,37 +53,14 @@ export default function CanvasBoard() {
     ctx.lineTo(x, y);
     ctx.stroke();
 
-    // Capture points for socket packet
-    setCurrentStroke((prev) => [...prev, { x, y }]);
+    addPoint({ x, y });
   };
 
-  // Stop drawing and prepare stroke packet
   const stopDrawing = () => {
     setIsDrawing(false);
-
-    console.log("Current Stroke Points:", currentStroke);
-
-    if (currentStroke.length > 0) {
-      const newStroke = {
-        strokeId: crypto.randomUUID(),
-        color,
-        brushSize,
-        points: currentStroke,
-      };
-      setStrokes((prev) => [...prev, newStroke]);
-      setCurrentStroke([]);
-    }
+    endStroke(color, brushSize);
   };
 
-  // Clear canvas function
-  const clearBoard = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    console.log("Canvas Width:", canvas.width, "Canvas Height:", canvas.height);
-  };
-
-  // Redraw canvas function to render all strokes (useful for syncing and clearing)
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -112,18 +84,12 @@ export default function CanvasBoard() {
     });
   };
 
-  
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Synced Canvas - Local Version</h2>
+      <h2>Zustand Synced Canvas</h2>
 
       <div style={{ marginBottom: "10px" }}>
-        <input
-          type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-        />
-
+        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         <input
           type="range"
           min="1"
@@ -131,8 +97,8 @@ export default function CanvasBoard() {
           value={brushSize}
           onChange={(e) => setBrushSize(e.target.value)}
         />
-
-        <button onClick={clearBoard}>Clear</button>
+        <button onClick={undo}>Undo</button>
+        <button onClick={clear}>Clear</button>
       </div>
 
       <canvas
@@ -148,3 +114,177 @@ export default function CanvasBoard() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+//  ###########################################################################
+
+// Use State and Local Storage for Stroke Management 
+
+// ############################################################################
+
+// import { useRef, useState, useEffect } from "react";
+
+// export default function CanvasBoard() {
+//   const canvasRef = useRef(null);
+
+//   const [isDrawing, setIsDrawing] = useState(false);
+//   const [color, setColor] = useState("#000000");
+//   const [brushSize, setBrushSize] = useState(5);
+
+//   // Stroke capture (project document ke hisaab se)
+//   const [currentStroke, setCurrentStroke] = useState([]);
+//   const lsStrokes = localStorage.getItem('canvasStrokes');
+//   const [strokes, setStrokes] = useState(lsStrokes ? JSON.parse(lsStrokes) : []);
+
+//   // Initialize canvas context on mount
+//   useEffect(() => {
+//     console.log("CanvasBoard Mounted");
+//     const canvas = canvasRef.current;
+//     const ctx = canvas.getContext("2d");
+
+//     ctx.lineCap = "round";
+//     ctx.lineJoin = "round";
+//   }, []);
+
+//  // Redraw canvas whenever strokes change (useful for syncing and clearing)
+//   useEffect(() => {
+//   localStorage.setItem('canvasStrokes', JSON.stringify(strokes));
+//   redrawCanvas();
+//   console.log("Strokes Updated:", strokes);
+// }, [strokes]);
+
+
+//   // Drawing Start function initializes the stroke and captures the starting point
+//   const startDrawing = (e) => {
+//     const canvas = canvasRef.current;
+//     const ctx = canvas.getContext("2d");
+
+//     const x = e.nativeEvent.offsetX;
+//     const y = e.nativeEvent.offsetY;
+
+//     setIsDrawing(true);
+//     setCurrentStroke([{ x, y }]);
+
+//     ctx.beginPath();
+//     ctx.moveTo(x, y);
+//   };
+
+//   // Draw function captures points and updates the stroke in real-time
+//   const draw = (e) => {
+//     if (!isDrawing) return;
+
+//     const canvas = canvasRef.current;
+//     const ctx = canvas.getContext("2d");
+
+//     const x = e.nativeEvent.offsetX;
+//     const y = e.nativeEvent.offsetY;
+
+//     ctx.strokeStyle = color;
+//     ctx.lineWidth = brushSize;
+
+//     ctx.lineTo(x, y);
+//     ctx.stroke();
+
+//     // Capture points for socket packet
+//     setCurrentStroke((prev) => [...prev, { x, y }]);
+//   };
+
+//   // Stop drawing and prepare stroke packet
+//   const stopDrawing = () => {
+//     setIsDrawing(false);
+
+//     console.log("Current Stroke Points:", currentStroke);
+
+//     if (currentStroke.length > 0) {
+//       const newStroke = {
+//         strokeId: crypto.randomUUID(),
+//         color,
+//         brushSize,
+//         points: currentStroke,
+//       };
+//       setStrokes((prev) => [...prev, newStroke]);
+//       setCurrentStroke([]);
+//     }
+//   };
+
+//   // Clear canvas function
+//   const clearBoard = () => {
+//     const canvas = canvasRef.current;
+//     const ctx = canvas.getContext("2d");
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     console.log("Canvas Width:", canvas.width, "Canvas Height:", canvas.height);
+//   };
+
+//   // Undo last stroke function
+//   const undoLastStroke = () => {
+//   setStrokes((prev) => prev.slice(0, -1));
+// };
+
+//   // Redraw canvas function to render all strokes (useful for syncing and clearing)
+//   const redrawCanvas = () => {
+//     const canvas = canvasRef.current;
+//     const ctx = canvas.getContext("2d");
+
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//     strokes.forEach((stroke) => {
+//       ctx.beginPath();
+//       ctx.strokeStyle = stroke.color;
+//       ctx.lineWidth = stroke.brushSize;
+
+//       stroke.points.forEach((point, index) => {
+//         if (index === 0) {
+//           ctx.moveTo(point.x, point.y);
+//         } else {
+//           ctx.lineTo(point.x, point.y);
+//         }
+//       });
+
+//       ctx.stroke();
+//     });
+//   };
+
+
+//   return (
+//     <div style={{ padding: "20px" }}>
+//       <h2>Synced Canvas - Local Version</h2>
+
+//       <div style={{ marginBottom: "10px" }}>
+//         <input
+//           type="color"
+//           value={color}
+//           onChange={(e) => setColor(e.target.value)}
+//         />
+
+//         <input
+//           type="range"
+//           min="1"
+//           max="20"
+//           value={brushSize}
+//           onChange={(e) => setBrushSize(e.target.value)}
+//         />
+//         <button onClick={undoLastStroke}>Undo</button>  
+//         <button onClick={clearBoard}>Clear</button>
+//       </div>
+
+//       <canvas
+//         ref={canvasRef}
+//         width={900}
+//         height={500}
+//         style={{ border: "2px solid black", background: "white" }}
+//         onMouseDown={startDrawing}
+//         onMouseMove={draw}
+//         onMouseUp={stopDrawing}
+//         onMouseLeave={stopDrawing}
+//       />
+//     </div>
+//   );
+// }
