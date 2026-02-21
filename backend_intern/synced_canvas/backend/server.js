@@ -10,18 +10,27 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"],
   },
 });
 
+// Socket.IO Connection
 io.on("connection", (socket) => {
+
   console.log("User connected:", socket.id);
 
-  socket.on("joinRoom", (roomId) => {
-    socket.join(roomId);
-    console.log(`${socket.id} joined ${roomId}`);
-  });
+ // Join Room
+socket.on("joinRoom", (roomId) => {
+  socket.join(roomId);
+  console.log(`${socket.id} joined ${roomId}`);
+});
+
+// Leave Room
+socket.on("leaveRoom", (roomId) => {
+  socket.leave(roomId);
+  console.log(`${socket.id} left ${roomId}`);
+});
 
   // Stroke Start
   socket.on("strokeStart", ({ roomId, x, y }) => {
@@ -43,14 +52,17 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("strokeEnd", { color, brushSize });
   });
 
+  // Undo
   socket.on("undo", ({ roomId }) => {
     socket.to(roomId).emit("undo");
   });
 
+  // Clear
   socket.on("clear", ({ roomId }) => {
     socket.to(roomId).emit("clear");
   });
 
+  // Disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });

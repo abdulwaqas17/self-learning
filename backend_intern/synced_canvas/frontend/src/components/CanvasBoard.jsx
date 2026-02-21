@@ -15,17 +15,16 @@ export default function CanvasBoard() {
   const clear = useCanvasStore((state) => state.clear);
 
   const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState("#000000");
+  const [color, setColor] = useState("#ffffff");
   const [brushSize, setBrushSize] = useState(5);
-
-  const roomId = "team1";
+  const [roomId, setRoomId] = useState("");
+  const [currentRoom, setCurrentRoom] = useState(null);
 
   // ===============================
-  // 🔥 SOCKET SETUP
+  // SOCKET SETUP
   // ===============================
   useEffect(() => {
-    socket.emit("joinRoom", roomId);
-
+    
     socket.on("strokeStart", ({ x, y }) => {
       startStroke({ x, y });
 
@@ -89,6 +88,22 @@ export default function CanvasBoard() {
   }, [strokes]);
 
   // ===============================
+  // ROOM JOINING
+  // ===============================
+  const joinRoom = () => {
+    if (!roomId.trim()) return;
+
+    if (currentRoom) {
+      socket.emit("leaveRoom", currentRoom);
+    }
+
+    socket.emit("joinRoom", roomId);
+    setCurrentRoom(roomId);
+
+    clear(); // reset canvas locally
+  };
+
+  // ===============================
   // START DRAW
   // ===============================
   const startDrawing = (e) => {
@@ -102,7 +117,7 @@ export default function CanvasBoard() {
     ctx.beginPath();
     ctx.moveTo(x, y);
 
-    socket.emit("strokeStart", { roomId, x, y });
+    socket.emit("strokeStart", { roomId:currentRoom, x, y });
   };
 
   // ===============================
@@ -130,9 +145,9 @@ export default function CanvasBoard() {
 
       addPoint(point);
 
-      // 🔥 Emit to other users
+      // Emit to other users
       socket.emit("strokePoint", {
-        roomId,
+        roomId:currentRoom,
         x: point.x,
         y: point.y,
         color,
@@ -151,14 +166,14 @@ export default function CanvasBoard() {
     endStroke(color, brushSize);
 
     socket.emit("strokeEnd", {
-      roomId,
+      roomId:currentRoom,
       color,
       brushSize,
     });
   };
 
   // ===============================
-  // REDRAW FUNCTION (UNCHANGED)
+  // REDRAW FUNCTION
   // ===============================
   const redrawCanvas = () => {
     const canvas = canvasRef.current;
@@ -188,6 +203,17 @@ export default function CanvasBoard() {
       <h2>Zustand Synced Canvas</h2>
 
       <div style={{ marginBottom: "10px" }}>
+        <div style={{ marginBottom: "10px" }}>
+  <input
+    type="text"
+    placeholder="Enter Room ID"
+    value={roomId}
+    onChange={(e) => setRoomId(e.target.value)}
+  />
+  <button onClick={joinRoom}>Join Room</button>
+</div>
+
+{currentRoom && <p>Current Room: {currentRoom}</p>}
         <input
           type="color"
           value={color}
@@ -203,7 +229,7 @@ export default function CanvasBoard() {
         <button
           onClick={() => {
             undo();
-            socket.emit("undo", { roomId });
+            socket.emit("undo", { roomId:currentRoom });
           }}
         >
           Undo
@@ -212,7 +238,7 @@ export default function CanvasBoard() {
         <button
           onClick={() => {
             clear();
-            socket.emit("clear", { roomId });
+            socket.emit("clear", { roomId:currentRoom });
           }}
         >
           Clear
@@ -223,7 +249,7 @@ export default function CanvasBoard() {
         ref={canvasRef}
         width={900}
         height={500}
-        style={{ border: "2px solid black", background: "white" }}
+        style={{ border: "2px solid black", background: "black" }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
