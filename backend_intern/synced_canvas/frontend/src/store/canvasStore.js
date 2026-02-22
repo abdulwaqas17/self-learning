@@ -2,31 +2,52 @@ import { create } from "zustand";
 
 export const useCanvasStore = create((set) => ({
   strokes: [],
-  currentStroke: [],
+  currentStrokes: {},
 
-  addPoint: (point) =>
-    set((state) => ({
-      currentStroke: [...state.currentStroke, point],
-    })),
+  startStroke: ({userId, strokeId, point}) =>
+  set((state) => ({
+    currentStrokes: {
+      ...state.currentStrokes,
+      [userId]: {
+        strokeId,
+        points: [point],
+      },
+    },
+  })),
 
-  startStroke: (point) =>
-    set({
-      currentStroke: [point],
-    }),
+  addPoint: ({userId, point}) =>
+  set((state) => ({
+    currentStrokes: {
+      ...state.currentStrokes,
+      [userId]: {
+        ...state.currentStrokes[userId],
+        points: [
+          ...state.currentStrokes[userId].points,
+          point,
+        ],
+      },
+    },
+  })),
 
-  endStroke: (color, brushSize) =>
-    set((state) => ({
-      strokes: [
-        ...state.strokes,
-        {
-          strokeId: crypto.randomUUID(),
-          color,
-          brushSize,
-          points: state.currentStroke,
-        },
-      ],
-      currentStroke: [],
-    })),
+ endStroke: ({userId, color, brushSize}) =>
+  set((state) => {
+
+    // stroke packet to be sent to server and stored in strokes array
+    const finishedStroke = {
+      strokeId: state.currentStrokes[userId].strokeId,
+      userId,
+      color,
+      brushSize,
+      points: state.currentStrokes[userId].points,
+    };
+
+    const { [userId]: _, ...rest } = state.currentStrokes;
+
+    return {
+      strokes: [...state.strokes, finishedStroke],
+      currentStrokes: rest,
+    };
+  }),
 
   undo: () =>
     set((state) => ({

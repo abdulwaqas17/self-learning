@@ -1,8 +1,10 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, use } from "react";
 import { useCanvasStore } from "../store/canvasStore";
 import { socket } from "../socket/socket";
 
 export default function CanvasBoard() {
+  console.log("socket", socket);
+
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const lastPointRef = useRef(null);
@@ -24,29 +26,28 @@ export default function CanvasBoard() {
   // SOCKET SETUP
   // ===============================
   useEffect(() => {
-    
-    socket.on("strokeStart", ({ x, y }) => {
-      startStroke({ x, y });
+    socket.on("strokeStart", ({ userId, strokeId, point }) => {
+      startStroke({ userId, strokeId, point });
 
       const ctx = canvasRef.current.getContext("2d");
       ctx.beginPath();
-      ctx.moveTo(x, y);
+      ctx.moveTo(point.x, point.y);
     });
 
-    socket.on("strokePoint", ({ x, y, color, brushSize }) => {
+    socket.on("strokePoint", ({ userId, point, color, brushSize }) => {
       const ctx = canvasRef.current.getContext("2d");
 
       ctx.strokeStyle = color;
       ctx.lineWidth = brushSize;
 
-      ctx.lineTo(x, y);
+      ctx.lineTo(point.x, point.y);
       ctx.stroke();
 
-      addPoint({ x, y });
+      addPoint({ userId, point });
     });
 
-    socket.on("strokeEnd", ({ color, brushSize }) => {
-      endStroke(color, brushSize);
+    socket.on("strokeEnd", ({ userId, color, brushSize }) => {
+      endStroke({ userId, color, brushSize });
     });
 
     socket.on("undo", () => {
@@ -111,13 +112,22 @@ export default function CanvasBoard() {
     const y = e.nativeEvent.offsetY;
 
     setIsDrawing(true);
-    startStroke({ x, y });
+    startStroke({
+      userId: socket.id,
+      strokeId: crypto.randomUUID(),
+      point: { x, y },
+    });
 
     const ctx = canvasRef.current.getContext("2d");
     ctx.beginPath();
     ctx.moveTo(x, y);
 
-    socket.emit("strokeStart", { roomId:currentRoom, x, y });
+    socket.emit("strokeStart", {
+      roomId: currentRoom,
+      userId: socket.id,
+      strokeId: crypto.randomUUID(),
+      point: { x, y },
+    });
   };
 
   // ===============================
@@ -143,13 +153,13 @@ export default function CanvasBoard() {
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
 
-      addPoint(point);
+      addPoint({userId: socket.id, point });
 
       // Emit to other users
       socket.emit("strokePoint", {
-        roomId:currentRoom,
-        x: point.x,
-        y: point.y,
+        roomId: currentRoom,
+        userId: socket.id,
+        point,
         color,
         brushSize,
       });
@@ -163,10 +173,11 @@ export default function CanvasBoard() {
   // ===============================
   const stopDrawing = () => {
     setIsDrawing(false);
-    endStroke(color, brushSize);
+    endStroke({ userId: socket.id, color, brushSize });
 
     socket.emit("strokeEnd", {
-      roomId:currentRoom,
+      roomId: currentRoom,
+      userId: socket.id,
       color,
       brushSize,
     });
@@ -204,16 +215,16 @@ export default function CanvasBoard() {
 
       <div style={{ marginBottom: "10px" }}>
         <div style={{ marginBottom: "10px" }}>
-  <input
-    type="text"
-    placeholder="Enter Room ID"
-    value={roomId}
-    onChange={(e) => setRoomId(e.target.value)}
-  />
-  <button onClick={joinRoom}>Join Room</button>
-</div>
+          <input
+            type="text"
+            placeholder="Enter Room ID"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          />
+          <button onClick={joinRoom}>Join Room</button>
+        </div>
 
-{currentRoom && <p>Current Room: {currentRoom}</p>}
+        {currentRoom && <p>Current Room: {currentRoom}</p>}
         <input
           type="color"
           value={color}
@@ -229,7 +240,7 @@ export default function CanvasBoard() {
         <button
           onClick={() => {
             undo();
-            socket.emit("undo", { roomId:currentRoom });
+            socket.emit("undo", { roomId: currentRoom });
           }}
         >
           Undo
@@ -238,7 +249,7 @@ export default function CanvasBoard() {
         <button
           onClick={() => {
             clear();
-            socket.emit("clear", { roomId:currentRoom });
+            socket.emit("clear", { roomId: currentRoom });
           }}
         >
           Clear

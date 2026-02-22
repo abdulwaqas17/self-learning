@@ -33,23 +33,23 @@ socket.on("leaveRoom", (roomId) => {
 });
 
   // Stroke Start
-  socket.on("strokeStart", ({ roomId, x, y }) => {
-    socket.to(roomId).emit("strokeStart", { x, y });
+  socket.on("strokeStart", ({ roomId,userId,strokeId,point }) => {
+    socket.to(roomId).emit("strokeStart", { userId,strokeId,point });
   });
 
   // Stroke Point (streaming)
-  socket.on("strokePoint", ({ roomId, x, y, color, brushSize }) => {
+  socket.on("strokePoint", ({ roomId, userId, point, color, brushSize }) => {
     socket.to(roomId).emit("strokePoint", {
-      x,
-      y,
+      userId,
+      point,
       color,
       brushSize,
     });
   });
 
   // Stroke End
-  socket.on("strokeEnd", ({ roomId, color, brushSize }) => {
-    socket.to(roomId).emit("strokeEnd", { color, brushSize });
+  socket.on("strokeEnd", ({ roomId,userId, color, brushSize }) => {
+    socket.to(roomId).emit("strokeEnd", { userId, color, brushSize });
   });
 
   // Undo
