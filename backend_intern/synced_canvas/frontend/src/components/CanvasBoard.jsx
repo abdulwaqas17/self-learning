@@ -3,7 +3,6 @@ import { useCanvasStore } from "../store/canvasStore";
 import { socket } from "../socket/socket";
 
 export default function CanvasBoard() {
-  console.log("socket", socket);
 
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
@@ -21,6 +20,8 @@ export default function CanvasBoard() {
   const [brushSize, setBrushSize] = useState(5);
   const [roomId, setRoomId] = useState("");
   const [currentRoom, setCurrentRoom] = useState(null);
+
+  // console.log("CanvasBoard Rendered with strokes:", strokes);
 
   // ===============================
   // SOCKET SETUP
@@ -50,8 +51,9 @@ export default function CanvasBoard() {
       endStroke({ userId, color, brushSize });
     });
 
-    socket.on("undo", () => {
-      undo();
+    socket.on("undo", ({ strokeId }) => {
+      console.log("Undoing stroke with ID:", strokeId);
+      undo(strokeId);
     });
 
     socket.on("clear", () => {
@@ -89,6 +91,38 @@ export default function CanvasBoard() {
   }, [strokes]);
 
   // ===============================
+  // find the last stroke ID of a user (used for undo functionality)
+  // ===============================
+  const findLastUserStrokeId = (strokes, userId) => {
+    const reversed = [...strokes].reverse();
+
+    const lastStroke = reversed.find((stroke) => stroke.userId === userId);
+    console.log("Last stroke for user", userId, "is", lastStroke);
+
+    return lastStroke ? lastStroke.strokeId : null;
+  };
+
+  // ===============================
+  // undo the last stroke of the current user
+  // ===============================
+  const undoLastStroke = () => {
+    const lastStrokeId = findLastUserStrokeId(strokes, socket.id);
+    console.log("Last Stroke ID for user", socket.id, "is", lastStrokeId);
+    if (!lastStrokeId) return;
+    console.log("undolastStroke");
+    
+
+    undo(lastStrokeId);
+
+    socket.emit("undo", {
+      roomId: currentRoom,
+      strokeId: lastStrokeId,
+    });
+  };
+
+
+
+  // ===============================
   // ROOM JOINING
   // ===============================
   const joinRoom = () => {
@@ -110,11 +144,11 @@ export default function CanvasBoard() {
   const startDrawing = (e) => {
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
-
+     const strokeId = crypto.randomUUID();
     setIsDrawing(true);
     startStroke({
       userId: socket.id,
-      strokeId: crypto.randomUUID(),
+      strokeId,
       point: { x, y },
     });
 
@@ -125,7 +159,7 @@ export default function CanvasBoard() {
     socket.emit("strokeStart", {
       roomId: currentRoom,
       userId: socket.id,
-      strokeId: crypto.randomUUID(),
+      strokeId,
       point: { x, y },
     });
   };
@@ -153,7 +187,7 @@ export default function CanvasBoard() {
       ctx.lineTo(point.x, point.y);
       ctx.stroke();
 
-      addPoint({userId: socket.id, point });
+      addPoint({ userId: socket.id, point });
 
       // Emit to other users
       socket.emit("strokePoint", {
@@ -238,10 +272,7 @@ export default function CanvasBoard() {
           onChange={(e) => setBrushSize(e.target.value)}
         />
         <button
-          onClick={() => {
-            undo();
-            socket.emit("undo", { roomId: currentRoom });
-          }}
+          onClick={undoLastStroke}
         >
           Undo
         </button>

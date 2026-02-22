@@ -53,8 +53,8 @@ socket.on("leaveRoom", (roomId) => {
   });
 
   // Undo
-  socket.on("undo", ({ roomId }) => {
-    socket.to(roomId).emit("undo");
+  socket.on("undo", ({ roomId ,strokeId}) => {
+    socket.to(roomId).emit("undo", { strokeId });
   });
 
   // Clear

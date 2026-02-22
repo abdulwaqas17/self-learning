@@ -4,41 +4,49 @@ export const useCanvasStore = create((set) => ({
   strokes: [],
   currentStrokes: {},
 
-  startStroke: ({userId, strokeId, point}) =>
-  set((state) => ({
-    currentStrokes: {
-      ...state.currentStrokes,
-      [userId]: {
-        strokeId,
-        points: [point],
+  // ==================================
+  // start a new stroke for a user with the initial point
+  // ==================================
+  startStroke: ({ userId, strokeId, point }) =>
+    set((state) => ({
+      currentStrokes: {
+        ...state.currentStrokes,
+        [userId]: {
+          strokeId,
+          points: [point],
+        },
       },
-    },
-  })),
+    })),
 
-  addPoint: ({userId, point}) =>
-  set((state) => ({
-    currentStrokes: {
-      ...state.currentStrokes,
-      [userId]: {
-        ...state.currentStrokes[userId],
-        points: [
-          ...state.currentStrokes[userId].points,
-          point,
-        ],
+  // ==================================
+  // add a point to the current stroke of a user
+  // ==================================
+  addPoint: ({ userId, point }) =>
+    set((state) => ({
+      currentStrokes: {
+        ...state.currentStrokes,
+        [userId]: {
+          ...state.currentStrokes[userId],
+          points: [...state.currentStrokes[userId].points, point],
+        },
       },
-    },
-  })),
+    })),
 
- endStroke: ({userId, color, brushSize}) =>
+  // ==================================
+  // end the stroke of a user and move it from currentStrokes to strokes array
+  // ===================================
+endStroke: ({ userId, color, brushSize }) =>
   set((state) => {
+    const current = state.currentStrokes[userId];
 
-    // stroke packet to be sent to server and stored in strokes array
+    if (!current) return {};
+
     const finishedStroke = {
-      strokeId: state.currentStrokes[userId].strokeId,
+      strokeId: current.strokeId,
       userId,
       color,
       brushSize,
-      points: state.currentStrokes[userId].points,
+      points: current.points,
     };
 
     const { [userId]: _, ...rest } = state.currentStrokes;
@@ -49,11 +57,17 @@ export const useCanvasStore = create((set) => ({
     };
   }),
 
-  undo: () =>
+  // ==================================
+  // undo the last stroke of a user
+  //===================================
+  undo: (strokeId) =>
     set((state) => ({
-      strokes: state.strokes.slice(0, -1),
+      strokes: state.strokes.filter((stroke) => stroke.strokeId !== strokeId),
     })),
 
+  // ==================================
+  // clear all strokes from the canvas
+  // ==================================
   clear: () =>
     set({
       strokes: [],
