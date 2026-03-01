@@ -20,7 +20,7 @@ export const generatePresignedUrl = async ({
   });
 
   const uploadUrl = await getSignedUrl(s3, command, {
-    expiresIn: 300,
+    expiresIn: 60,
   });
 
   return {

@@ -124,14 +124,14 @@ export default function Login() {
 
       console.log('=============upload url==============');
       console.log(data);
-      console.log(data.data);
+
       console.log(file);
       
       console.log('=============upload url==============');
 
       // 2️⃣ PUT request → DIRECT S3
-  if(data.data.uploadUrl){
-        await fetch(data.data.uploadUrl, {
+  if(data.uploadUrl){
+        await fetch(data.uploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": file.type

@@ -2,9 +2,17 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { CloudFrontClient } from "@aws-sdk/client-cloudfront";
 
 export const s3 = new S3Client({
-  region: process.env.AWS_REGION
-});
+  region: process.env.AWS_REGION,
 
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  }
+
+  // CRITICAL (fixes presigned PUT 403 issue)
+  // requestChecksumCalculation: "WHEN_REQUIRED",
+  // responseChecksumValidation: "WHEN_REQUIRED",
+});
 export const cloudFront = new CloudFrontClient({
   region: process.env.AWS_REGION
 });

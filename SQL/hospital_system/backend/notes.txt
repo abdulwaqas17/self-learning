@@ -9,19 +9,5 @@ DESCRIBE users;
 
 PORT=5000
 
-DATABASE_URL="mysql://root:W@qa$@127.0.0.1:3306/backend_intern_first_task"
-
 JWT_SECRET=supersecretkey
 NODE_ENV=development
-
-AWS_REGION=ap-south-1
-S3_BUCKET_NAME=mediavault-task
-CDN_URL=d1kvdit69wkmny.cloudfront.net
-
-GOOGLE_CLIENT_ID=511499252119-gf8kr5ejjkns2eaqamqjmototi4meqhh.apps.googleusercontent.com
-
-
-https://414482992523.signin.aws.amazon.com/console
-
-abdual-waqas
-iW9gf{cL
